@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+
+<DialogPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.jscheduler.ui.dialog.AssignmentDialogController">
+    <content>
+        <GridPane hgap="10" vgap="8">
+            <padding>
+                <Insets top="12" right="12" bottom="12" left="12"/>
+            </padding>
+            <columnConstraints>
+                <ColumnConstraints minWidth="90" halignment="RIGHT"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <Label text="Course" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <ComboBox fx:id="courseCombo" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Title" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="titleField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <Label text="Description" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextArea fx:id="descriptionArea" prefRowCount="3"
+                      GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label text="Due" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <DatePicker fx:id="dueDatePicker" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label text="Deadline" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <DatePicker fx:id="deadlineDatePicker" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+            <Label text="Status" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <ComboBox fx:id="statusCombo" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+            <Label text="Notes" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <TextArea fx:id="notesArea" prefRowCount="3"
+                      GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+        </GridPane>
+    </content>
+    <buttonTypes>
+        <ButtonType fx:constant="OK_DONE"/>
+        <ButtonType fx:constant="CANCEL"/>
+    </buttonTypes>
+</DialogPane>

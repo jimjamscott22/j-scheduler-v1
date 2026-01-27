@@ -1,16 +1,26 @@
 package com.jscheduler.ui;
 
+import com.jscheduler.data.CourseRepository;
+import com.jscheduler.model.Course;
+import com.jscheduler.ui.dialog.CourseDialogController;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+
+import java.io.IOException;
+import java.util.Optional;
 
 public class MainController {
 
@@ -28,13 +38,15 @@ public class MainController {
     private Button addAssignmentButton;
 
     @FXML
-    private ListView<String> courseListView;
+    private ListView<Course> courseListView;
     @FXML
     private Button addCourseButton;
     @FXML
     private Button editCourseButton;
     @FXML
     private Button deleteCourseButton;
+
+    private CourseRepository courseRepository;
 
     @FXML
     private TableView<Object> assignmentTable;
@@ -96,7 +108,10 @@ public class MainController {
         ));
         detailStatusComboBox.getSelectionModel().selectFirst();
 
+        courseRepository = CourseRepository.getInstance();
+        courseListView.setItems(courseRepository.getCourses());
         courseListView.setPlaceholder(new Label("No courses yet."));
+
         assignmentTable.setPlaceholder(new Label("No assignments yet."));
         statusLabel.setText("Saved");
         nextDueLabel.setText("Next due: --");
@@ -104,6 +119,31 @@ public class MainController {
 
     @FXML
     private void handleAddCourse() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/ui/CourseDialog.fxml"));
+            DialogPane dialogPane = loader.load();
+
+            CourseDialogController controller = loader.getController();
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Add Course");
+            dialog.setDialogPane(dialogPane);
+
+            Optional<ButtonType> result = dialog.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                controller.setOkClicked(true);
+                Course newCourse = controller.getCourse();
+                if (newCourse != null) {
+                    courseRepository.addCourse(newCourse);
+                    statusLabel.setText("Course added successfully");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            statusLabel.setText("Error opening course dialog");
+        }
     }
 
     @FXML

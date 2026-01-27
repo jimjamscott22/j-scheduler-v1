@@ -36,7 +36,7 @@
         </GridPane>
     </content>
     <buttonTypes>
-        <ButtonType fx:constant="OK_DONE"/>
+        <ButtonType fx:constant="OK"/>
         <ButtonType fx:constant="CANCEL"/>
     </buttonTypes>
 </DialogPane>

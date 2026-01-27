@@ -1,0 +1,245 @@
+/* Root styling */
+.root {
+    -fx-base: #f4f4f8;
+    -fx-background: #f4f4f8;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+/* Toolbar styling */
+.tool-bar {
+    -fx-background-color: linear-gradient(to bottom, #667eea 0%, #5568d3 100%);
+    -fx-padding: 10;
+    -fx-spacing: 8;
+}
+
+.tool-bar .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.tool-bar .combo-box {
+    -fx-background-color: white;
+}
+
+.tool-bar .text-field {
+    -fx-background-color: white;
+    -fx-prompt-text-fill: #888;
+}
+
+.tool-bar .date-picker {
+    -fx-background-color: white;
+}
+
+/* Button styling */
+.button {
+    -fx-background-color: #764ba2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #8b5bb3;
+}
+
+.button:pressed {
+    -fx-background-color: #653d8a;
+}
+
+/* Add buttons (green theme) */
+.add-button {
+    -fx-background-color: #11998e;
+    -fx-text-fill: white;
+}
+
+.add-button:hover {
+    -fx-background-color: #13b49f;
+}
+
+.add-button:pressed {
+    -fx-background-color: #0f8679;
+}
+
+/* Delete button (red theme) */
+.delete-button {
+    -fx-background-color: #ee5a6f;
+    -fx-text-fill: white;
+}
+
+.delete-button:hover {
+    -fx-background-color: #f06b7f;
+}
+
+.delete-button:pressed {
+    -fx-background-color: #d9495e;
+}
+
+/* Edit button (blue theme) */
+.edit-button {
+    -fx-background-color: #4facfe;
+    -fx-text-fill: white;
+}
+
+.edit-button:hover {
+    -fx-background-color: #6fbdfe;
+}
+
+.edit-button:pressed {
+    -fx-background-color: #3a9ae5;
+}
+
+/* Table styling */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 1;
+}
+
+.table-view .column-header {
+    -fx-background-color: linear-gradient(to bottom, #667eea 0%, #5568d3 100%);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #667eea;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #c7d2fe;
+    -fx-text-fill: #1e293b;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #e0e7ff;
+}
+
+/* ListView styling */
+.list-view {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 1;
+}
+
+.list-cell:selected {
+    -fx-background-color: #c7d2fe;
+    -fx-text-fill: #1e293b;
+}
+
+.list-cell:hover {
+    -fx-background-color: #e0e7ff;
+}
+
+/* Tab styling */
+.tab-pane {
+    -fx-background-color: #f4f4f8;
+}
+
+.tab {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 5 5 0 0;
+}
+
+.tab:selected {
+    -fx-background-color: white;
+    -fx-font-weight: bold;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #667eea;
+}
+
+/* TitledPane styling */
+.titled-pane {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 1 0 0 0;
+}
+
+.titled-pane > .title {
+    -fx-background-color: linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 100%);
+    -fx-text-fill: #334155;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* TextArea and TextField styling */
+.text-area, .text-field {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+.text-area:focused, .text-field:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+/* ComboBox styling */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+/* DatePicker styling */
+.date-picker {
+    -fx-background-color: white;
+}
+
+/* SplitPane styling */
+.split-pane {
+    -fx-background-color: #f4f4f8;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-background-color: #cbd5e1;
+    -fx-padding: 0 2 0 2;
+}
+
+/* Label styling */
+.label {
+    -fx-text-fill: #334155;
+}
+
+/* Status bar styling */
+.status-bar {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-label {
+    -fx-text-fill: #10b981;
+    -fx-font-weight: bold;
+}
+
+/* VBox with courses */
+.courses-panel {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 0 1 0 0;
+}
+
+.courses-panel .label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+/* Section headers */
+.section-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}

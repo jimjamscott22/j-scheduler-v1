@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.jscheduler.ui.MainController"
+            stylesheets="@styles.css">
+    <top>
+        <ToolBar>
+            <Label text="Semester"/>
+            <ComboBox fx:id="semesterCombo" prefWidth="140"/>
+            <Separator/>
+            <TextField fx:id="searchField" promptText="Search assignments..." prefWidth="220"/>
+            <ComboBox fx:id="statusFilterCombo" promptText="Status" prefWidth="140"/>
+            <DatePicker fx:id="fromDatePicker" promptText="From"/>
+            <DatePicker fx:id="toDatePicker" promptText="To"/>
+            <Separator/>
+            <Button fx:id="addAssignmentButton" text="+ Assignment" onAction="#handleAddAssignment" styleClass="add-button"/>
+            <Button text="+ Course" onAction="#handleAddCourse" styleClass="add-button"/>
+        </ToolBar>
+    </top>
+
+    <center>
+        <TabPane>
+            <tabs>
+                <Tab text="Assignments" closable="false">
+                    <BorderPane>
+                        <center>
+                            <SplitPane dividerPositions="0.25">
+                                <items>
+                                    <VBox spacing="8" styleClass="courses-panel">
+                                        <padding>
+                                            <Insets top="10" right="10" bottom="10" left="10"/>
+                                        </padding>
+                                        <Label text="Courses" styleClass="section-label"/>
+                                        <ListView fx:id="courseListView" VBox.vgrow="ALWAYS"/>
+                                        <HBox spacing="6">
+                                            <Button fx:id="addCourseButton" text="+ Add" onAction="#handleAddCourse" styleClass="add-button"/>
+                                            <Button fx:id="editCourseButton" text="Edit" onAction="#handleEditCourse" styleClass="edit-button"/>
+                                            <Button fx:id="deleteCourseButton" text="Delete" onAction="#handleDeleteCourse" styleClass="delete-button"/>
+                                        </HBox>
+                                    </VBox>
+
+                                    <BorderPane>
+                                        <top>
+                                            <Label text="Assignments" BorderPane.alignment="CENTER_LEFT" styleClass="section-label">
+                                                <BorderPane.margin>
+                                                    <Insets top="8" right="8" bottom="8" left="8"/>
+                                                </BorderPane.margin>
+                                            </Label>
+                                        </top>
+                                        <center>
+                                            <TableView fx:id="assignmentTable" prefHeight="420">
+                                                <columns>
+                                                    <TableColumn fx:id="titleColumn" text="Title" prefWidth="180"/>
+                                                    <TableColumn fx:id="courseColumn" text="Course" prefWidth="120"/>
+                                                    <TableColumn fx:id="dueColumn" text="Due" prefWidth="110"/>
+                                                    <TableColumn fx:id="deadlineColumn" text="Deadline" prefWidth="120"/>
+                                                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="110"/>
+                                                    <TableColumn fx:id="notesColumn" text="Notes" prefWidth="180"/>
+                                                </columns>
+                                            </TableView>
+                                        </center>
+                                        <bottom>
+                                            <TitledPane text="Details" collapsible="false">
+                                                <content>
+                                                    <GridPane hgap="10" vgap="8">
+                                                        <padding>
+                                                            <Insets top="10" right="10" bottom="10" left="10"/>
+                                                        </padding>
+                                                        <columnConstraints>
+                                                            <ColumnConstraints minWidth="80" halignment="RIGHT"/>
+                                                            <ColumnConstraints hgrow="ALWAYS"/>
+                                                            <ColumnConstraints minWidth="90" halignment="RIGHT"/>
+                                                            <ColumnConstraints hgrow="ALWAYS"/>
+                                                        </columnConstraints>
+
+                                                        <Label text="Title" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                                        <TextField fx:id="detailTitleField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                                        <Label text="Due" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                                        <DatePicker fx:id="detailDueDatePicker" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                                        <Label text="Deadline" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                                        <DatePicker fx:id="detailDeadlineDatePicker" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                                        <Label text="Status" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                                        <ComboBox fx:id="detailStatusComboBox" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                                        <Label text="Notes" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                                        <TextArea fx:id="detailNotesArea" prefRowCount="3"
+                                                                  GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                                                  GridPane.columnSpan="3"/>
+
+                                                        <HBox spacing="8" alignment="CENTER_RIGHT"
+                                                              GridPane.rowIndex="3" GridPane.columnIndex="0"
+                                                              GridPane.columnSpan="4">
+                                                            <Button fx:id="detailRevertButton" text="Revert"
+                                                                    onAction="#handleRevertDetails"/>
+                                                            <Button fx:id="detailSaveButton" text="Save"
+                                                                    onAction="#handleSaveDetails"/>
+                                                        </HBox>
+                                                    </GridPane>
+                                                </content>
+                                            </TitledPane>
+                                        </bottom>
+                                    </BorderPane>
+                                </items>
+                            </SplitPane>
+                        </center>
+                    </BorderPane>
+                </Tab>
+
+                <Tab text="Calendar" closable="false">
+                    <StackPane>
+                        <Label text="Calendar view coming soon."/>
+                    </StackPane>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+
+    <bottom>
+        <HBox spacing="8" styleClass="status-bar">
+            <padding>
+                <Insets top="8" right="8" bottom="8" left="8"/>
+            </padding>
+            <Label fx:id="statusLabel" text="Saved" styleClass="status-label"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="nextDueLabel" text="Next due: --"/>
+        </HBox>
+    </bottom>
+</BorderPane>

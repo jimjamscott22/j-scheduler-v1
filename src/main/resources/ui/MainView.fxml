@@ -25,7 +25,8 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.jscheduler.ui.MainController">
+            fx:controller="com.jscheduler.ui.MainController"
+            stylesheets="@styles.css">
     <top>
         <ToolBar>
             <Label text="Semester"/>
@@ -36,8 +37,8 @@
             <DatePicker fx:id="fromDatePicker" promptText="From"/>
             <DatePicker fx:id="toDatePicker" promptText="To"/>
             <Separator/>
-            <Button fx:id="addAssignmentButton" text="+ Assignment" onAction="#handleAddAssignment"/>
-            <Button text="+ Course" onAction="#handleAddCourse"/>
+            <Button fx:id="addAssignmentButton" text="+ Assignment" onAction="#handleAddAssignment" styleClass="add-button"/>
+            <Button text="+ Course" onAction="#handleAddCourse" styleClass="add-button"/>
         </ToolBar>
     </top>
 
@@ -49,22 +50,22 @@
                         <center>
                             <SplitPane dividerPositions="0.25">
                                 <items>
-                                    <VBox spacing="8">
+                                    <VBox spacing="8" styleClass="courses-panel">
                                         <padding>
                                             <Insets top="10" right="10" bottom="10" left="10"/>
                                         </padding>
-                                        <Label text="Courses"/>
+                                        <Label text="Courses" styleClass="section-label"/>
                                         <ListView fx:id="courseListView" VBox.vgrow="ALWAYS"/>
                                         <HBox spacing="6">
-                                            <Button fx:id="addCourseButton" text="+ Add" onAction="#handleAddCourse"/>
-                                            <Button fx:id="editCourseButton" text="Edit" onAction="#handleEditCourse"/>
-                                            <Button fx:id="deleteCourseButton" text="Delete" onAction="#handleDeleteCourse"/>
+                                            <Button fx:id="addCourseButton" text="+ Add" onAction="#handleAddCourse" styleClass="add-button"/>
+                                            <Button fx:id="editCourseButton" text="Edit" onAction="#handleEditCourse" styleClass="edit-button"/>
+                                            <Button fx:id="deleteCourseButton" text="Delete" onAction="#handleDeleteCourse" styleClass="delete-button"/>
                                         </HBox>
                                     </VBox>
 
                                     <BorderPane>
                                         <top>
-                                            <Label text="Assignments" BorderPane.alignment="CENTER_LEFT">
+                                            <Label text="Assignments" BorderPane.alignment="CENTER_LEFT" styleClass="section-label">
                                                 <BorderPane.margin>
                                                     <Insets top="8" right="8" bottom="8" left="8"/>
                                                 </BorderPane.margin>
@@ -140,11 +141,11 @@
     </center>
 
     <bottom>
-        <HBox spacing="8">
+        <HBox spacing="8" styleClass="status-bar">
             <padding>
                 <Insets top="8" right="8" bottom="8" left="8"/>
             </padding>
-            <Label fx:id="statusLabel" text="Saved"/>
+            <Label fx:id="statusLabel" text="Saved" styleClass="status-label"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="nextDueLabel" text="Next due: --"/>
         </HBox>
