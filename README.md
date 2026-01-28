@@ -109,15 +109,87 @@ Example:
 ```
 
 ## Getting Started
-This repo is in early planning. Build files and source code will be added next.
 
-Prerequisites
-- JDK 17+
-- JavaFX SDK (if not using a build plugin that pulls JavaFX)
+### Prerequisites
+- **JDK 17, 19, or 21 (LTS recommended)** - Download from [Oracle](https://www.oracle.com/java/technologies/downloads/) or [Adoptium](https://adoptium.net/temurin/releases/)
+- **Git** (optional, for cloning the repository)
 
-Planned run commands (once build files exist)
-- Gradle: `./gradlew run`
-- Maven: `mvn javafx:run`
+**Important:** This project uses Gradle 8.12, which supports Java 17-21. If you have a newer Java version (22+), you'll need to install Java 21 alongside it.
+
+Note: JavaFX dependencies are automatically managed by the Gradle JavaFX plugin - no manual setup required.
+
+### Setup Instructions
+
+1. **Clone or download the repository**
+   ```bash
+   git clone https://github.com/yourusername/j-scheduler-v1.git
+   cd j-scheduler-v1
+   ```
+
+2. **Verify Java installation**
+   ```bash
+   java -version
+   ```
+   Ensure version 17 or higher is installed.
+
+3. **Build the project**
+   
+   On Windows (PowerShell):
+   ```powershell
+   .\gradlew.bat build
+   ```
+   
+   On Windows (Command Prompt):
+   ```cmd
+   gradlew.bat build
+   ```
+   
+   On Linux/Mac:
+   ```bash
+   ./gradlew build
+   ```
+
+4. **Run the application**
+   
+   On Windows (PowerShell):
+   ```powershell
+   .\gradlew.bat run
+   ```
+   
+   On Windows (Command Prompt):
+   ```cmd
+   gradlew.bat run
+   ```
+   
+   On Linux/Mac:
+   ```bash
+   ./gradlew run
+   ```
+
+### Troubleshooting
+
+- **"Unsupported class file major version"**: Your Java version is too new for Gradle 8.12. Install Java 21 LTS from [Adoptium](https://adoptium.net/temurin/releases/?version=21) and set JAVA_HOME:
+  ```powershell
+  # PowerShell (temporary, for current session)
+  $env:JAVA_HOME="C:\Program Files\Eclipse Adoptium\jdk-21.0.x-hotspot"
+  
+  # To set permanently (Windows):
+  # 1. Search "Environment Variables" in Windows
+  # 2. Click "Environment Variables" button
+  # 3. Add/Edit JAVA_HOME under System Variables
+  # 4. Restart your terminal/IDE
+  ```
+
+- **JAVA_HOME not set**: Ensure the `JAVA_HOME` environment variable points to your JDK 17-21 installation
+- **Permission denied (Linux/Mac)**: Run `chmod +x gradlew` to make the Gradle wrapper executable
+- **Build fails**: Try cleaning first with `./gradlew clean build`
+
+### Development
+
+To open the project in an IDE:
+- **IntelliJ IDEA**: File → Open → Select the project folder (build.gradle will be auto-detected)
+- **Eclipse**: Import → Gradle → Existing Gradle Project
+- **VS Code**: Open folder with Java Extension Pack installed
 
 ## Roadmap
 Phase 1: MVP
