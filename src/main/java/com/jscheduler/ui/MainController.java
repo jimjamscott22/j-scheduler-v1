@@ -1,8 +1,12 @@
 package com.jscheduler.ui;
 
+import com.jscheduler.data.AssignmentRepository;
 import com.jscheduler.data.CourseRepository;
+import com.jscheduler.model.Assignment;
 import com.jscheduler.model.Course;
+import com.jscheduler.ui.dialog.AssignmentDialogController;
 import com.jscheduler.ui.dialog.CourseDialogController;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,6 +24,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public class MainController {
@@ -47,21 +52,23 @@ public class MainController {
     private Button deleteCourseButton;
 
     private CourseRepository courseRepository;
+    private AssignmentRepository assignmentRepository;
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @FXML
-    private TableView<Object> assignmentTable;
+    private TableView<Assignment> assignmentTable;
     @FXML
-    private TableColumn<Object, String> titleColumn;
+    private TableColumn<Assignment, String> titleColumn;
     @FXML
-    private TableColumn<Object, String> courseColumn;
+    private TableColumn<Assignment, String> courseColumn;
     @FXML
-    private TableColumn<Object, String> dueColumn;
+    private TableColumn<Assignment, String> dueColumn;
     @FXML
-    private TableColumn<Object, String> deadlineColumn;
+    private TableColumn<Assignment, String> deadlineColumn;
     @FXML
-    private TableColumn<Object, String> statusColumn;
+    private TableColumn<Assignment, String> statusColumn;
     @FXML
-    private TableColumn<Object, String> notesColumn;
+    private TableColumn<Assignment, String> notesColumn;
 
     @FXML
     private TextField detailTitleField;
@@ -112,7 +119,21 @@ public class MainController {
         courseListView.setItems(courseRepository.getCourses());
         courseListView.setPlaceholder(new Label("No courses yet."));
 
+        assignmentRepository = AssignmentRepository.getInstance();
+        assignmentTable.setItems(assignmentRepository.getAssignments());
         assignmentTable.setPlaceholder(new Label("No assignments yet."));
+        titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+        courseColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                resolveCourseName(cellData.getValue())
+        ));
+        dueColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                formatDate(cellData.getValue().getDueDate())
+        ));
+        deadlineColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                formatDate(cellData.getValue().getDeadline())
+        ));
+        statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        notesColumn.setCellValueFactory(cellData -> cellData.getValue().notesProperty());
         statusLabel.setText("Saved");
         nextDueLabel.setText("Next due: --");
     }
@@ -156,6 +177,37 @@ public class MainController {
 
     @FXML
     private void handleAddAssignment() {
+        if (courseRepository.getCourses().isEmpty()) {
+            statusLabel.setText("Add a course before creating assignments");
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/ui/AssignmentDialog.fxml"));
+            DialogPane dialogPane = loader.load();
+
+            AssignmentDialogController controller = loader.getController();
+            Course selectedCourse = courseListView.getSelectionModel().getSelectedItem();
+            controller.setCourseOptions(courseRepository.getCourses(), selectedCourse);
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Add Assignment");
+            dialog.setDialogPane(dialogPane);
+
+            Optional<ButtonType> result = dialog.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                controller.setOkClicked(true);
+                Assignment newAssignment = controller.getAssignment();
+                if (newAssignment != null) {
+                    assignmentRepository.addAssignment(newAssignment);
+                    statusLabel.setText("Assignment added successfully");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            statusLabel.setText("Error opening assignment dialog");
+        }
     }
 
     @FXML
@@ -164,5 +216,25 @@ public class MainController {
 
     @FXML
     private void handleRevertDetails() {
+    }
+
+    private String resolveCourseName(Assignment assignment) {
+        String courseId = assignment.getCourseId();
+        if (courseId == null) {
+            return "--";
+        }
+        for (Course course : courseRepository.getCourses()) {
+            if (courseId.equals(course.getId())) {
+                return course.getName();
+            }
+        }
+        return "--";
+    }
+
+    private String formatDate(java.time.LocalDate date) {
+        if (date == null) {
+            return "--";
+        }
+        return dateFormatter.format(date);
     }
 }
