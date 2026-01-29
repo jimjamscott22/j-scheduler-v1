@@ -7,6 +7,11 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    // MariaDB JDBC Driver
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21

@@ -157,8 +157,11 @@ public class MainController {
                 controller.setOkClicked(true);
                 Course newCourse = controller.getCourse();
                 if (newCourse != null) {
-                    courseRepository.addCourse(newCourse);
-                    statusLabel.setText("Course added successfully");
+                    if (courseRepository.addCourse(newCourse)) {
+                        statusLabel.setText("Course added successfully");
+                    } else {
+                        statusLabel.setText("Failed to add course to database");
+                    }
                 }
             }
         } catch (IOException e) {
@@ -200,8 +203,11 @@ public class MainController {
                 controller.setOkClicked(true);
                 Assignment newAssignment = controller.getAssignment();
                 if (newAssignment != null) {
-                    assignmentRepository.addAssignment(newAssignment);
-                    statusLabel.setText("Assignment added successfully");
+                    if (assignmentRepository.addAssignment(newAssignment)) {
+                        statusLabel.setText("Assignment added successfully");
+                    } else {
+                        statusLabel.setText("Failed to add assignment to database");
+                    }
                 }
             }
         } catch (IOException e) {
