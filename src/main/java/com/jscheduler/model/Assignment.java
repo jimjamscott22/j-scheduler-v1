@@ -4,8 +4,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class Assignment {
     private final StringProperty id;
@@ -13,54 +13,137 @@ public class Assignment {
     private final StringProperty title;
     private final StringProperty description;
     private final ObjectProperty<LocalDate> dueDate;
-    private final ObjectProperty<LocalDate> deadline;
-    private final StringProperty status;
+    private final ObjectProperty<LocalDate> submissionDeadline;
+    private final ObjectProperty<AssignmentStatus> status;
     private final StringProperty notes;
 
+    private final StringProperty courseName;
+
+    public Assignment(String courseId, String title, String description,
+                     LocalDate dueDate, LocalDate submissionDeadline,
+                     AssignmentStatus status, String notes) {
+        this(generateId(), courseId, title, description, dueDate, submissionDeadline, status, notes);
+    }
+
     public Assignment(String id, String courseId, String title, String description,
-                      LocalDate dueDate, LocalDate deadline, String status, String notes) {
+                     LocalDate dueDate, LocalDate submissionDeadline,
+                     AssignmentStatus status, String notes) {
         this.id = new SimpleStringProperty(id);
         this.courseId = new SimpleStringProperty(courseId);
         this.title = new SimpleStringProperty(title);
         this.description = new SimpleStringProperty(description);
         this.dueDate = new SimpleObjectProperty<>(dueDate);
-        this.deadline = new SimpleObjectProperty<>(deadline);
-        this.status = new SimpleStringProperty(status);
+        this.submissionDeadline = new SimpleObjectProperty<>(submissionDeadline);
+        this.status = new SimpleObjectProperty<>(status != null ? status : AssignmentStatus.NOT_STARTED);
         this.notes = new SimpleStringProperty(notes);
+        this.courseName = new SimpleStringProperty("");
     }
 
-    // Property getters
-    public StringProperty idProperty() { return id; }
-    public StringProperty courseIdProperty() { return courseId; }
-    public StringProperty titleProperty() { return title; }
-    public StringProperty descriptionProperty() { return description; }
-    public ObjectProperty<LocalDate> dueDateProperty() { return dueDate; }
-    public ObjectProperty<LocalDate> deadlineProperty() { return deadline; }
-    public StringProperty statusProperty() { return status; }
-    public StringProperty notesProperty() { return notes; }
+    private static String generateId() {
+        return "a_" + UUID.randomUUID().toString().substring(0, 8);
+    }
 
-    // Value getters
-    public String getId() { return id.get(); }
-    public String getCourseId() { return courseId.get(); }
-    public String getTitle() { return title.get(); }
-    public String getDescription() { return description.get(); }
-    public LocalDate getDueDate() { return dueDate.get(); }
-    public LocalDate getDeadline() { return deadline.get(); }
-    public String getStatus() { return status.get(); }
-    public String getNotes() { return notes.get(); }
+    public StringProperty idProperty() {
+        return id;
+    }
 
-    // Setters
-    public void setId(String value) { id.set(value); }
-    public void setCourseId(String value) { courseId.set(value); }
-    public void setTitle(String value) { title.set(value); }
-    public void setDescription(String value) { description.set(value); }
-    public void setDueDate(LocalDate value) { dueDate.set(value); }
-    public void setDeadline(LocalDate value) { deadline.set(value); }
-    public void setStatus(String value) { status.set(value); }
-    public void setNotes(String value) { notes.set(value); }
+    public String getId() {
+        return id.get();
+    }
 
-    @Override
-    public String toString() {
+    public StringProperty courseIdProperty() {
+        return courseId;
+    }
+
+    public String getCourseId() {
+        return courseId.get();
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId.set(courseId);
+    }
+
+    public StringProperty titleProperty() {
+        return title;
+    }
+
+    public String getTitle() {
         return title.get();
+    }
+
+    public void setTitle(String title) {
+        this.title.set(title);
+    }
+
+    public StringProperty descriptionProperty() {
+        return description;
+    }
+
+    public String getDescription() {
+        return description.get();
+    }
+
+    public void setDescription(String description) {
+        this.description.set(description);
+    }
+
+    public ObjectProperty<LocalDate> dueDateProperty() {
+        return dueDate;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate.get();
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate.set(dueDate);
+    }
+
+    public ObjectProperty<LocalDate> submissionDeadlineProperty() {
+        return submissionDeadline;
+    }
+
+    public LocalDate getSubmissionDeadline() {
+        return submissionDeadline.get();
+    }
+
+    public void setSubmissionDeadline(LocalDate submissionDeadline) {
+        this.submissionDeadline.set(submissionDeadline);
+    }
+
+    public ObjectProperty<AssignmentStatus> statusProperty() {
+        return status;
+    }
+
+    public AssignmentStatus getStatus() {
+        return status.get();
+    }
+
+    public void setStatus(AssignmentStatus status) {
+        this.status.set(status);
+    }
+
+    public StringProperty notesProperty() {
+        return notes;
+    }
+
+    public String getNotes() {
+        return notes.get();
+    }
+
+    public void setNotes(String notes) {
+        this.notes.set(notes);
+    }
+
+    public StringProperty courseNameProperty() {
+        return courseName;
+    }
+
+    public String getCourseName() {
+        return courseName.get();
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName.set(courseName);
     }
 }

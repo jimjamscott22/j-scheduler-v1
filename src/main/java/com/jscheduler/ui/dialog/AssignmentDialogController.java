@@ -1,21 +1,22 @@
 package com.jscheduler.ui.dialog;
 
 import com.jscheduler.model.Assignment;
+import com.jscheduler.model.AssignmentStatus;
 import com.jscheduler.model.Course;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AssignmentDialogController {
 
     @FXML
-    private ComboBox<Course> courseCombo;
+    private DialogPane dialogPane;
+    @FXML
+    private ComboBox<String> courseCombo;
     @FXML
     private TextField titleField;
     @FXML
@@ -29,8 +30,10 @@ public class AssignmentDialogController {
     @FXML
     private TextArea notesArea;
 
-    private Assignment assignment;
-    private boolean okClicked = false;
+    private Assignment result;
+    private boolean editMode = false;
+    private String assignmentId;
+    private Map<String, String> courseMap = new HashMap<>();
 
     @FXML
     private void initialize() {
@@ -41,46 +44,80 @@ public class AssignmentDialogController {
                 "Late"
         ));
         statusCombo.getSelectionModel().selectFirst();
-    }
 
-    public void setCourseOptions(ObservableList<Course> courses, Course selectedCourse) {
-        courseCombo.setItems(courses);
-        if (selectedCourse != null) {
-            courseCombo.getSelectionModel().select(selectedCourse);
-        } else if (!courses.isEmpty()) {
-            courseCombo.getSelectionModel().selectFirst();
+        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+        if (okButton != null) {
+            okButton.disableProperty().bind(
+                titleField.textProperty().isEmpty()
+                .or(courseCombo.valueProperty().isNull())
+                .or(dueDatePicker.valueProperty().isNull())
+            );
         }
     }
 
-    public Assignment getAssignment() {
-        if (okClicked) {
-            Course selectedCourse = courseCombo.getSelectionModel().getSelectedItem();
-            String courseId = selectedCourse == null ? null : selectedCourse.getId();
-            if (assignment == null) {
-                assignment = new Assignment(
-                        UUID.randomUUID().toString(),
-                        courseId,
-                        titleField.getText(),
-                        descriptionArea.getText(),
-                        dueDatePicker.getValue(),
-                        deadlineDatePicker.getValue(),
-                        statusCombo.getValue(),
-                        notesArea.getText()
-                );
-            } else {
-                assignment.setCourseId(courseId);
-                assignment.setTitle(titleField.getText());
-                assignment.setDescription(descriptionArea.getText());
-                assignment.setDueDate(dueDatePicker.getValue());
-                assignment.setDeadline(deadlineDatePicker.getValue());
-                assignment.setStatus(statusCombo.getValue());
-                assignment.setNotes(notesArea.getText());
+    public void setCourses(List<Course> courses) {
+        courseMap.clear();
+        for (Course course : courses) {
+            courseMap.put(course.getName(), course.getId());
+        }
+        courseCombo.setItems(FXCollections.observableArrayList(courseMap.keySet()));
+    }
+
+    public void setData(Assignment assignment) {
+        if (assignment != null) {
+            this.editMode = true;
+            this.assignmentId = assignment.getId();
+            titleField.setText(assignment.getTitle());
+            descriptionArea.setText(assignment.getDescription());
+            dueDatePicker.setValue(assignment.getDueDate());
+            deadlineDatePicker.setValue(assignment.getSubmissionDeadline());
+            notesArea.setText(assignment.getNotes());
+
+            if (assignment.getStatus() != null) {
+                statusCombo.setValue(assignment.getStatus().getDisplayName());
+            }
+
+            for (Map.Entry<String, String> entry : courseMap.entrySet()) {
+                if (entry.getValue().equals(assignment.getCourseId())) {
+                    courseCombo.setValue(entry.getKey());
+                    break;
+                }
             }
         }
-        return assignment;
     }
 
-    public void setOkClicked(boolean okClicked) {
-        this.okClicked = okClicked;
+    public Assignment getResult() {
+        if (result == null) {
+            String selectedCourseName = courseCombo.getValue();
+            String courseId = courseMap.get(selectedCourseName);
+            String title = titleField.getText().trim();
+            String description = descriptionArea.getText() != null ? descriptionArea.getText().trim() : "";
+            String notes = notesArea.getText() != null ? notesArea.getText().trim() : "";
+            AssignmentStatus status = AssignmentStatus.fromString(statusCombo.getValue());
+
+            if (editMode) {
+                result = new Assignment(
+                    assignmentId,
+                    courseId,
+                    title,
+                    description,
+                    dueDatePicker.getValue(),
+                    deadlineDatePicker.getValue(),
+                    status,
+                    notes
+                );
+            } else {
+                result = new Assignment(
+                    courseId,
+                    title,
+                    description,
+                    dueDatePicker.getValue(),
+                    deadlineDatePicker.getValue(),
+                    status,
+                    notes
+                );
+            }
+        }
+        return result;
     }
 }

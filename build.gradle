@@ -1,24 +1,22 @@
 plugins {
+    id 'java'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
 }
+
+group = 'com.jscheduler'
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    // MariaDB JDBC Driver
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 javafx {
-    version = "17.0.6"
+    version = '21.0.2'
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
@@ -26,13 +24,8 @@ application {
     mainClass = 'com.jscheduler.App'
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/java']
-        }
-        resources {
-            srcDirs = ['src/main/resources']
-        }
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
