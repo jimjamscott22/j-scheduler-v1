@@ -69,3 +69,4 @@ logs/
 *.log.*
 temp/
 tmp/
+.gradle/file-system.probe
