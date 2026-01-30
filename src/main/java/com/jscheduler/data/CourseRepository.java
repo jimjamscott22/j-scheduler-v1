@@ -5,7 +5,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
-import java.util.UUID;
 
 public class CourseRepository {
     private static CourseRepository instance;
@@ -62,11 +61,6 @@ public class CourseRepository {
      * @return true if successful, false otherwise
      */
     public boolean addCourse(Course course) {
-        // Generate ID if not set
-        if (course.getId() == null || course.getId().isEmpty()) {
-            course.setId(UUID.randomUUID().toString());
-        }
-
         String sql = "INSERT INTO courses (id, name, description, professor, semester) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

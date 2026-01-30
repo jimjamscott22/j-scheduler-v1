@@ -1,11 +1,11 @@
 package com.jscheduler.data;
 
 import com.jscheduler.model.Assignment;
+import com.jscheduler.model.AssignmentStatus;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
-import java.util.UUID;
 
 public class AssignmentRepository {
     private static AssignmentRepository instance;
@@ -48,7 +48,7 @@ public class AssignmentRepository {
                         rs.getString("description"),
                         rs.getDate("due_date") != null ? rs.getDate("due_date").toLocalDate() : null,
                         rs.getDate("deadline") != null ? rs.getDate("deadline").toLocalDate() : null,
-                        rs.getString("status"),
+                        AssignmentStatus.fromString(rs.getString("status")),
                         rs.getString("notes")
                 );
                 assignments.add(assignment);
@@ -66,11 +66,6 @@ public class AssignmentRepository {
      * @return true if successful, false otherwise
      */
     public boolean addAssignment(Assignment assignment) {
-        // Generate ID if not set
-        if (assignment.getId() == null || assignment.getId().isEmpty()) {
-            assignment.setId(UUID.randomUUID().toString());
-        }
-
         String sql = "INSERT INTO assignments (id, course_id, title, description, due_date, deadline, status, notes) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dbConnection.getConnection();
@@ -81,8 +76,8 @@ public class AssignmentRepository {
             pstmt.setString(3, assignment.getTitle());
             pstmt.setString(4, assignment.getDescription());
             pstmt.setDate(5, assignment.getDueDate() != null ? Date.valueOf(assignment.getDueDate()) : null);
-            pstmt.setDate(6, assignment.getDeadline() != null ? Date.valueOf(assignment.getDeadline()) : null);
-            pstmt.setString(7, assignment.getStatus());
+            pstmt.setDate(6, assignment.getSubmissionDeadline() != null ? Date.valueOf(assignment.getSubmissionDeadline()) : null);
+            pstmt.setString(7, assignment.getStatus().getDisplayName());
             pstmt.setString(8, assignment.getNotes());
 
             int rowsAffected = pstmt.executeUpdate();
@@ -138,8 +133,8 @@ public class AssignmentRepository {
             pstmt.setString(2, assignment.getTitle());
             pstmt.setString(3, assignment.getDescription());
             pstmt.setDate(4, assignment.getDueDate() != null ? Date.valueOf(assignment.getDueDate()) : null);
-            pstmt.setDate(5, assignment.getDeadline() != null ? Date.valueOf(assignment.getDeadline()) : null);
-            pstmt.setString(6, assignment.getStatus());
+            pstmt.setDate(5, assignment.getSubmissionDeadline() != null ? Date.valueOf(assignment.getSubmissionDeadline()) : null);
+            pstmt.setString(6, assignment.getStatus().getDisplayName());
             pstmt.setString(7, assignment.getNotes());
             pstmt.setString(8, assignment.getId());
 
