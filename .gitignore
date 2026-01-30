@@ -1,7 +1,6 @@
 ### Gradle ###
 .gradle/
 **/build/
-!src/**/build/
 
 # Gradle Wrapper
 # Comment the next line if you want to commit the wrapper jar
