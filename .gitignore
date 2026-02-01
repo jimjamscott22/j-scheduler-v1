@@ -69,3 +69,4 @@ logs/
 temp/
 tmp/
 .gradle/file-system.probe
+previous-compilation-data.bin
