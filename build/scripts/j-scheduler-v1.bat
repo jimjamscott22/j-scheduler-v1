@@ -70,7 +70,7 @@ goto fail
 :execute
 @rem Setup the command line
 
-set CLASSPATH=%APP_HOME%\lib\j-scheduler-v1.jar;%APP_HOME%\lib\javafx-fxml-17.0.6-win.jar;%APP_HOME%\lib\javafx-controls-17.0.6-win.jar;%APP_HOME%\lib\javafx-graphics-17.0.6-win.jar;%APP_HOME%\lib\javafx-base-17.0.6-win.jar
+set CLASSPATH=%APP_HOME%\lib\j-scheduler-v1-1.0-SNAPSHOT.jar;%APP_HOME%\lib\gson-2.10.1.jar;%APP_HOME%\lib\mariadb-java-client-3.1.4.jar;%APP_HOME%\lib\javafx-fxml-21.0.2-win.jar;%APP_HOME%\lib\javafx-controls-21.0.2-win.jar;%APP_HOME%\lib\waffle-jna-3.2.0.jar;%APP_HOME%\lib\javafx-graphics-21.0.2-win.jar;%APP_HOME%\lib\jna-platform-5.12.1.jar;%APP_HOME%\lib\jna-5.12.1.jar;%APP_HOME%\lib\jcl-over-slf4j-1.7.36.jar;%APP_HOME%\lib\slf4j-api-1.7.36.jar;%APP_HOME%\lib\caffeine-2.9.3.jar;%APP_HOME%\lib\checker-qual-3.23.0.jar;%APP_HOME%\lib\javafx-base-21.0.2-win.jar;%APP_HOME%\lib\error_prone_annotations-2.10.0.jar
 
 
 @rem Execute j-scheduler-v1

@@ -1,8 +1,9 @@
 package com.jscheduler.ui;
 
+import com.jscheduler.data.AssignmentRepository;
+import com.jscheduler.data.CourseRepository;
 import com.jscheduler.model.Assignment;
 import com.jscheduler.model.Course;
-import com.jscheduler.service.DataService;
 import com.jscheduler.ui.dialog.AssignmentDialogController;
 import com.jscheduler.ui.dialog.CourseDialogController;
 import javafx.beans.binding.Bindings;
@@ -54,7 +55,8 @@ public class MainController {
     @FXML
     private TableColumn<Assignment, String> notesColumn;
 
-    private DataService dataService;
+    private CourseRepository courseRepository;
+    private AssignmentRepository assignmentRepository;
     private Assignment currentAssignment;
 
     @FXML
@@ -79,7 +81,8 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        dataService = DataService.getInstance();
+        courseRepository = CourseRepository.getInstance();
+        assignmentRepository = AssignmentRepository.getInstance();
 
         semesterCombo.setItems(FXCollections.observableArrayList(
                 "Fall 2026",
@@ -104,8 +107,18 @@ public class MainController {
         ));
         detailStatusComboBox.getSelectionModel().selectFirst();
 
-        courseListView.setItems(dataService.getCourses());
+        courseListView.setItems(courseRepository.getCourses());
         courseListView.setPlaceholder(new Label("No courses yet."));
+
+        // Double-click to view/edit course details
+        courseListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Course selectedCourse = courseListView.getSelectionModel().getSelectedItem();
+                if (selectedCourse != null) {
+                    handleEditCourse();
+                }
+            }
+        });
 
         titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         courseColumn.setCellValueFactory(cellData -> cellData.getValue().courseNameProperty());
@@ -123,7 +136,7 @@ public class MainController {
         }, cellData.getValue().statusProperty()));
         notesColumn.setCellValueFactory(cellData -> cellData.getValue().notesProperty());
 
-        assignmentTable.setItems(dataService.getAssignments());
+        assignmentTable.setItems(assignmentRepository.getAssignments());
         assignmentTable.setPlaceholder(new Label("No assignments yet."));
 
         assignmentTable.getSelectionModel().selectedItemProperty().addListener(
@@ -151,8 +164,11 @@ public class MainController {
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.isPresent() && result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 Course course = controller.getResult();
-                dataService.addCourse(course);
-                statusLabel.setText("Course added: " + course.getName());
+                if (courseRepository.addCourse(course)) {
+                    statusLabel.setText("Course added: " + course.getName());
+                } else {
+                    showError("Error", "Failed to add course to database");
+                }
             }
         } catch (IOException e) {
             showError("Error", "Could not open course dialog: " + e.getMessage());
@@ -180,13 +196,12 @@ public class MainController {
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.isPresent() && result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 Course updatedCourse = controller.getResult();
-                selectedCourse.setName(updatedCourse.getName());
-                selectedCourse.setDescription(updatedCourse.getDescription());
-                selectedCourse.setProfessor(updatedCourse.getProfessor());
-                selectedCourse.setSemester(updatedCourse.getSemester());
-                dataService.updateCourse(selectedCourse);
-                courseListView.refresh();
-                statusLabel.setText("Course updated: " + selectedCourse.getName());
+                if (courseRepository.updateCourse(selectedCourse, updatedCourse)) {
+                    courseListView.refresh();
+                    statusLabel.setText("Course updated: " + selectedCourse.getName());
+                } else {
+                    showError("Error", "Failed to update course in database");
+                }
             }
         } catch (IOException e) {
             showError("Error", "Could not open course dialog: " + e.getMessage());
@@ -208,8 +223,11 @@ public class MainController {
 
         Optional<ButtonType> result = confirmation.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            dataService.deleteCourse(selectedCourse);
-            statusLabel.setText("Course deleted: " + selectedCourse.getName());
+            if (courseRepository.removeCourse(selectedCourse)) {
+                statusLabel.setText("Course deleted: " + selectedCourse.getName());
+            } else {
+                showError("Error", "Failed to delete course from database");
+            }
         }
     }
 
@@ -222,7 +240,7 @@ public class MainController {
     }
 
     private void updateNextDueLabel() {
-        Assignment nextAssignment = dataService.getNextDueAssignment();
+        Assignment nextAssignment = getNextDueAssignment();
         if (nextAssignment != null) {
             String dateStr = nextAssignment.getDueDate().format(DateTimeFormatter.ofPattern("MMM dd"));
             nextDueLabel.setText("Next due: " + nextAssignment.getTitle() + " (" + dateStr + ")");
@@ -231,9 +249,18 @@ public class MainController {
         }
     }
 
+    private Assignment getNextDueAssignment() {
+        java.time.LocalDate today = java.time.LocalDate.now();
+        return assignmentRepository.getAssignments().stream()
+                .filter(a -> a.getDueDate() != null && !a.getDueDate().isBefore(today))
+                .filter(a -> a.getStatus() != com.jscheduler.model.AssignmentStatus.SUBMITTED)
+                .min(java.util.Comparator.comparing(Assignment::getDueDate))
+                .orElse(null);
+    }
+
     @FXML
     private void handleAddAssignment() {
-        if (dataService.getCourses().isEmpty()) {
+        if (courseRepository.getCourses().isEmpty()) {
             showError("No Courses", "Please add a course first before creating assignments.");
             return;
         }
@@ -242,7 +269,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/AssignmentDialog.fxml"));
             DialogPane dialogPane = loader.load();
             AssignmentDialogController controller = loader.getController();
-            controller.setCourses(dataService.getCourses());
+            controller.setCourses(courseRepository.getCourses());
 
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);
@@ -251,13 +278,27 @@ public class MainController {
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.isPresent() && result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 Assignment assignment = controller.getResult();
-                dataService.addAssignment(assignment);
-                statusLabel.setText("Assignment added: " + assignment.getTitle());
-                updateNextDueLabel();
+                Course course = findCourseById(assignment.getCourseId());
+                if (course != null) {
+                    assignment.setCourseName(course.getName());
+                }
+                if (assignmentRepository.addAssignment(assignment)) {
+                    statusLabel.setText("Assignment added: " + assignment.getTitle());
+                    updateNextDueLabel();
+                } else {
+                    showError("Error", "Failed to add assignment to database");
+                }
             }
         } catch (IOException e) {
             showError("Error", "Could not open assignment dialog: " + e.getMessage());
         }
+    }
+
+    private Course findCourseById(String id) {
+        return courseRepository.getCourses().stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @FXML
@@ -272,10 +313,13 @@ public class MainController {
         currentAssignment.setStatus(com.jscheduler.model.AssignmentStatus.fromString(detailStatusComboBox.getValue()));
         currentAssignment.setNotes(detailNotesArea.getText());
 
-        dataService.updateAssignment(currentAssignment);
-        assignmentTable.refresh();
-        statusLabel.setText("Saved assignment: " + currentAssignment.getTitle());
-        updateNextDueLabel();
+        if (assignmentRepository.updateAssignment(currentAssignment)) {
+            assignmentTable.refresh();
+            statusLabel.setText("Saved assignment: " + currentAssignment.getTitle());
+            updateNextDueLabel();
+        } else {
+            showError("Error", "Failed to update assignment in database");
+        }
     }
 
     @FXML
