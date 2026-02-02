@@ -72,6 +72,29 @@ public class DatabaseConnection {
             return DriverManager.getConnection(url, username, password);
         } catch (ClassNotFoundException e) {
             throw new SQLException("MariaDB JDBC Driver not found", e);
+        } catch (SQLException e) {
+            // If remote connection fails due to authentication, try localhost fallback
+            if (e.getMessage().contains("Access denied") && !url.contains("localhost")) {
+                System.err.println("Remote database authentication failed: " + e.getMessage());
+                System.err.println("Attempting to connect to local database instead...");
+                
+                String localUrl = "jdbc:mariadb://localhost:3306/" + 
+                    url.substring(url.lastIndexOf("/") + 1);
+                try {
+                    Connection localConn = DriverManager.getConnection(localUrl, "root", "");
+                    System.out.println("Successfully connected to local database");
+                    // Update connection settings for future calls
+                    this.url = localUrl;
+                    this.username = "root";
+                    this.password = "";
+                    return localConn;
+                } catch (SQLException localEx) {
+                    System.err.println("Local database connection also failed: " + localEx.getMessage());
+                }
+            }
+            throw new SQLException("Database authentication failed. Please check credentials in database.properties\n" +
+                    "Current config: " + url + " (user: " + username + ")\n" +
+                    "Original error: " + e.getMessage(), e);
         }
     }
 
