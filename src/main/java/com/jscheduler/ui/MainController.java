@@ -4,6 +4,7 @@ import com.jscheduler.data.AssignmentRepository;
 import com.jscheduler.data.CourseRepository;
 import com.jscheduler.model.Assignment;
 import com.jscheduler.model.Course;
+import com.jscheduler.model.AssignmentStatus;
 import com.jscheduler.ui.dialog.AssignmentDialogController;
 import com.jscheduler.ui.dialog.CourseDialogController;
 import javafx.beans.binding.Bindings;
@@ -73,6 +74,12 @@ public class MainController {
     private Button detailSaveButton;
     @FXML
     private Button detailRevertButton;
+    @FXML
+    private Button editAssignmentButton;
+    @FXML
+    private Button deleteAssignmentButton;
+    @FXML
+    private Button detailDeleteButton;
 
     @FXML
     private Label statusLabel;
@@ -134,17 +141,56 @@ public class MainController {
             var status = cellData.getValue().getStatus();
             return status != null ? status.getDisplayName() : "";
         }, cellData.getValue().statusProperty()));
+
+        statusColumn.setCellFactory(column -> new TableCell<Assignment, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    getStyleClass().removeAll("status-not-started", "status-in-progress", "status-submitted", "status-late");
+                } else {
+                    setText(item);
+                    getStyleClass().removeAll("status-not-started", "status-in-progress", "status-submitted", "status-late");
+                    
+                    AssignmentStatus status = AssignmentStatus.fromString(item);
+                    switch (status) {
+                        case NOT_STARTED -> getStyleClass().add("status-not-started");
+                        case IN_PROGRESS -> getStyleClass().add("status-in-progress");
+                        case SUBMITTED -> getStyleClass().add("status-submitted");
+                        case LATE -> getStyleClass().add("status-late");
+                    }
+                }
+            }
+        });
         notesColumn.setCellValueFactory(cellData -> cellData.getValue().notesProperty());
 
         assignmentTable.setItems(assignmentRepository.getAssignments());
         assignmentTable.setPlaceholder(new Label("No assignments yet."));
 
         assignmentTable.getSelectionModel().selectedItemProperty().addListener(
-            (obs, oldSelection, newSelection) -> populateDetailPanel(newSelection)
+            (obs, oldSelection, newSelection) -> {
+                populateDetailPanel(newSelection);
+                updateAssignmentButtons(newSelection);
+            }
         );
+
+        // Double-click to edit assignment
+        assignmentTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Assignment selectedAssignment = assignmentTable.getSelectionModel().getSelectedItem();
+                if (selectedAssignment != null) {
+                    handleEditAssignment();
+                }
+            }
+        });
 
         detailSaveButton.setDisable(true);
         detailRevertButton.setDisable(true);
+        if (editAssignmentButton != null) editAssignmentButton.setDisable(true);
+        if (deleteAssignmentButton != null) deleteAssignmentButton.setDisable(true);
+        if (detailDeleteButton != null) detailDeleteButton.setDisable(true);
 
         statusLabel.setText("Saved");
         updateNextDueLabel();
@@ -228,6 +274,101 @@ public class MainController {
             } else {
                 showError("Error", "Failed to delete course from database");
             }
+        }
+    }
+
+    private void updateAssignmentButtons(Assignment assignment) {
+        boolean disabled = (assignment == null);
+        if (editAssignmentButton != null) editAssignmentButton.setDisable(disabled);
+        if (deleteAssignmentButton != null) deleteAssignmentButton.setDisable(disabled);
+        if (detailDeleteButton != null) detailDeleteButton.setDisable(disabled);
+    }
+
+    @FXML
+    private void handleDeleteAssignment() {
+        Assignment assignmentToDelete = currentAssignment;
+        // If triggered from the table context, we might want the table selection
+        if (assignmentToDelete == null) {
+            assignmentToDelete = assignmentTable.getSelectionModel().getSelectedItem();
+        }
+
+        if (assignmentToDelete == null) {
+            return;
+        }
+
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Delete Assignment");
+        confirmation.setHeaderText("Delete assignment: " + assignmentToDelete.getTitle() + "?");
+        confirmation.setContentText("Are you sure you want to delete this assignment?");
+
+        Optional<ButtonType> result = confirmation.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (assignmentRepository.removeAssignment(assignmentToDelete)) {
+                statusLabel.setText("Assignment deleted: " + assignmentToDelete.getTitle());
+                if (assignmentToDelete == currentAssignment) {
+                    clearDetailPanel();
+                }
+                updateNextDueLabel();
+            } else {
+                showError("Error", "Failed to delete assignment from database");
+            }
+        }
+    }
+
+    @FXML
+    private void handleEditAssignment() {
+        Assignment selectedAssignment = assignmentTable.getSelectionModel().getSelectedItem();
+        if (selectedAssignment == null) {
+            selectedAssignment = currentAssignment;
+        }
+
+        if (selectedAssignment == null) {
+            showError("No Selection", "Please select an assignment to edit.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/AssignmentDialog.fxml"));
+            DialogPane dialogPane = loader.load();
+            AssignmentDialogController controller = loader.getController();
+            controller.setCourses(courseRepository.getCourses());
+            controller.setData(selectedAssignment);
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setDialogPane(dialogPane);
+            dialog.setTitle("Edit Assignment");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.isPresent() && result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                Assignment updatedAssignment = controller.getResult();
+                
+                // Update properties of the existing assignment object
+                selectedAssignment.setCourseId(updatedAssignment.getCourseId());
+                selectedAssignment.setTitle(updatedAssignment.getTitle());
+                selectedAssignment.setDescription(updatedAssignment.getDescription());
+                selectedAssignment.setDueDate(updatedAssignment.getDueDate());
+                selectedAssignment.setSubmissionDeadline(updatedAssignment.getSubmissionDeadline());
+                selectedAssignment.setStatus(updatedAssignment.getStatus());
+                selectedAssignment.setNotes(updatedAssignment.getNotes());
+                
+                Course course = findCourseById(selectedAssignment.getCourseId());
+                if (course != null) {
+                    selectedAssignment.setCourseName(course.getName());
+                }
+
+                if (assignmentRepository.updateAssignment(selectedAssignment)) {
+                    assignmentTable.refresh();
+                    if (selectedAssignment == currentAssignment) {
+                        populateDetailPanel(selectedAssignment);
+                    }
+                    statusLabel.setText("Assignment updated: " + selectedAssignment.getTitle());
+                    updateNextDueLabel();
+                } else {
+                    showError("Error", "Failed to update assignment in database");
+                }
+            }
+        } catch (IOException e) {
+            showError("Error", "Could not open assignment dialog: " + e.getMessage());
         }
     }
 
@@ -343,6 +484,7 @@ public class MainController {
 
         detailSaveButton.setDisable(false);
         detailRevertButton.setDisable(false);
+        if (detailDeleteButton != null) detailDeleteButton.setDisable(false);
     }
 
     private void clearDetailPanel() {
@@ -355,5 +497,6 @@ public class MainController {
 
         detailSaveButton.setDisable(true);
         detailRevertButton.setDisable(true);
+        if (detailDeleteButton != null) detailDeleteButton.setDisable(true);
     }
 }

@@ -25,7 +25,8 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.jscheduler.ui.MainController">
+            fx:controller="com.jscheduler.ui.MainController"
+            stylesheets="@styles.css">
     <top>
         <ToolBar>
             <Label text="Semester"/>
@@ -49,11 +50,11 @@
                         <center>
                             <SplitPane dividerPositions="0.25">
                                 <items>
-                                    <VBox spacing="8">
+                                    <VBox spacing="8" styleClass="courses-panel">
                                         <padding>
                                             <Insets top="10" right="10" bottom="10" left="10"/>
                                         </padding>
-                                        <Label text="Courses"/>
+                                        <Label text="Courses" styleClass="section-label"/>
                                         <ListView fx:id="courseListView" VBox.vgrow="ALWAYS"/>
                                         <HBox spacing="6">
                                             <Button fx:id="addCourseButton" text="+ Add" onAction="#handleAddCourse"/>
@@ -64,11 +65,15 @@
 
                                     <BorderPane>
                                         <top>
-                                            <Label text="Assignments" BorderPane.alignment="CENTER_LEFT">
-                                                <BorderPane.margin>
+                                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                                <padding>
                                                     <Insets top="8" right="8" bottom="8" left="8"/>
-                                                </BorderPane.margin>
-                                            </Label>
+                                                </padding>
+                                                <Label text="Assignments" styleClass="section-label"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Button fx:id="editAssignmentButton" text="Edit" onAction="#handleEditAssignment" styleClass="edit-button"/>
+                                                <Button fx:id="deleteAssignmentButton" text="Delete" onAction="#handleDeleteAssignment" styleClass="delete-button"/>
+                                            </HBox>
                                         </top>
                                         <center>
                                             <TableView fx:id="assignmentTable" prefHeight="420">
@@ -85,7 +90,7 @@
                                         <bottom>
                                             <TitledPane text="Details" collapsible="false">
                                                 <content>
-                                                    <GridPane hgap="10" vgap="8">
+                                                    <GridPane hgap="10" vgap="8" styleClass="details-grid">
                                                         <padding>
                                                             <Insets top="10" right="10" bottom="10" left="10"/>
                                                         </padding>
@@ -114,6 +119,10 @@
                                                         <HBox spacing="8" alignment="CENTER_RIGHT"
                                                               GridPane.rowIndex="3" GridPane.columnIndex="0"
                                                               GridPane.columnSpan="4">
+                                                            <Button fx:id="detailDeleteButton" text="Delete"
+                                                                    onAction="#handleDeleteAssignment"
+                                                                    styleClass="delete-button"/>
+                                                            <Region HBox.hgrow="ALWAYS"/>
                                                             <Button fx:id="detailRevertButton" text="Revert"
                                                                     onAction="#handleRevertDetails"/>
                                                             <Button fx:id="detailSaveButton" text="Save"
