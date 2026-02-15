@@ -32,7 +32,8 @@ public class CourseRepository {
      * Load all courses from the database into the observable list.
      */
     private void loadCoursesFromDatabase() {
-        String sql = "SELECT id, name, description, professor, semester FROM courses ORDER BY semester, name";
+        String sql = "SELECT id, name, description, professor, semester, credit_hours, current_grade, letter_grade " +
+                     "FROM courses ORDER BY semester, name";
         try (Connection conn = dbConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -44,7 +45,10 @@ public class CourseRepository {
                         rs.getString("name"),
                         rs.getString("description"),
                         rs.getString("professor"),
-                        rs.getString("semester")
+                        rs.getString("semester"),
+                        rs.getObject("credit_hours") != null ? rs.getDouble("credit_hours") : 3.0,
+                        rs.getObject("current_grade") != null ? rs.getDouble("current_grade") : null,
+                        rs.getString("letter_grade")
                 );
                 courses.add(course);
             }
@@ -61,7 +65,8 @@ public class CourseRepository {
      * @return true if successful, false otherwise
      */
     public boolean addCourse(Course course) {
-        String sql = "INSERT INTO courses (id, name, description, professor, semester) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO courses (id, name, description, professor, semester, credit_hours, current_grade, letter_grade) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -70,6 +75,14 @@ public class CourseRepository {
             pstmt.setString(3, course.getDescription());
             pstmt.setString(4, course.getProfessor());
             pstmt.setString(5, course.getSemester());
+            pstmt.setDouble(6, course.getCreditHours() != null ? course.getCreditHours() : 3.0);
+
+            if (course.getCurrentGrade() != null) {
+                pstmt.setDouble(7, course.getCurrentGrade());
+            } else {
+                pstmt.setNull(7, java.sql.Types.DECIMAL);
+            }
+            pstmt.setString(8, course.getLetterGrade());
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -116,7 +129,8 @@ public class CourseRepository {
      * @return true if successful, false otherwise
      */
     public boolean updateCourse(Course oldCourse, Course newCourse) {
-        String sql = "UPDATE courses SET name = ?, description = ?, professor = ?, semester = ? WHERE id = ?";
+        String sql = "UPDATE courses SET name = ?, description = ?, professor = ?, semester = ?, " +
+                     "credit_hours = ?, current_grade = ?, letter_grade = ? WHERE id = ?";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -124,7 +138,15 @@ public class CourseRepository {
             pstmt.setString(2, newCourse.getDescription());
             pstmt.setString(3, newCourse.getProfessor());
             pstmt.setString(4, newCourse.getSemester());
-            pstmt.setString(5, oldCourse.getId());
+            pstmt.setDouble(5, newCourse.getCreditHours() != null ? newCourse.getCreditHours() : 3.0);
+
+            if (newCourse.getCurrentGrade() != null) {
+                pstmt.setDouble(6, newCourse.getCurrentGrade());
+            } else {
+                pstmt.setNull(6, java.sql.Types.DECIMAL);
+            }
+            pstmt.setString(7, newCourse.getLetterGrade());
+            pstmt.setString(8, oldCourse.getId());
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -135,6 +157,9 @@ public class CourseRepository {
                     oldCourse.setDescription(newCourse.getDescription());
                     oldCourse.setProfessor(newCourse.getProfessor());
                     oldCourse.setSemester(newCourse.getSemester());
+                    oldCourse.setCreditHours(newCourse.getCreditHours());
+                    oldCourse.setCurrentGrade(newCourse.getCurrentGrade());
+                    oldCourse.setLetterGrade(newCourse.getLetterGrade());
                 }
                 System.out.println("Course updated: " + newCourse.getName());
                 return true;

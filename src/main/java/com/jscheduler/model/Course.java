@@ -1,7 +1,6 @@
 package com.jscheduler.model;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import java.util.UUID;
 
 public class Course {
@@ -11,16 +10,29 @@ public class Course {
     private final StringProperty professor;
     private final StringProperty semester;
 
+    // New fields for GPA calculation
+    private final ObjectProperty<Double> creditHours;
+    private final ObjectProperty<Double> currentGrade;
+    private final StringProperty letterGrade;
+
     public Course(String name, String description, String professor, String semester) {
-        this(generateId(), name, description, professor, semester);
+        this(generateId(), name, description, professor, semester, 3.0, null, null);
     }
 
     public Course(String id, String name, String description, String professor, String semester) {
+        this(id, name, description, professor, semester, 3.0, null, null);
+    }
+
+    public Course(String id, String name, String description, String professor, String semester,
+                  Double creditHours, Double currentGrade, String letterGrade) {
         this.id = new SimpleStringProperty(id);
         this.name = new SimpleStringProperty(name);
         this.description = new SimpleStringProperty(description);
         this.professor = new SimpleStringProperty(professor);
         this.semester = new SimpleStringProperty(semester);
+        this.creditHours = new SimpleObjectProperty<>(creditHours != null ? creditHours : 3.0);
+        this.currentGrade = new SimpleObjectProperty<>(currentGrade);
+        this.letterGrade = new SimpleStringProperty(letterGrade);
     }
 
     private static String generateId() {
@@ -81,6 +93,45 @@ public class Course {
 
     public void setSemester(String semester) {
         this.semester.set(semester);
+    }
+
+    // Credit hours
+    public ObjectProperty<Double> creditHoursProperty() {
+        return creditHours;
+    }
+
+    public Double getCreditHours() {
+        return creditHours.get();
+    }
+
+    public void setCreditHours(Double creditHours) {
+        this.creditHours.set(creditHours);
+    }
+
+    // Current grade
+    public ObjectProperty<Double> currentGradeProperty() {
+        return currentGrade;
+    }
+
+    public Double getCurrentGrade() {
+        return currentGrade.get();
+    }
+
+    public void setCurrentGrade(Double currentGrade) {
+        this.currentGrade.set(currentGrade);
+    }
+
+    // Letter grade
+    public StringProperty letterGradeProperty() {
+        return letterGrade;
+    }
+
+    public String getLetterGrade() {
+        return letterGrade.get();
+    }
+
+    public void setLetterGrade(String letterGrade) {
+        this.letterGrade.set(letterGrade);
     }
 
     @Override

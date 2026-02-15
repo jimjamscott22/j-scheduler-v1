@@ -33,7 +33,8 @@ public class AssignmentRepository {
      * Load all assignments from the database into the observable list.
      */
     private void loadAssignmentsFromDatabase() {
-        String sql = "SELECT id, course_id, title, description, due_date, deadline, status, notes " +
+        String sql = "SELECT id, course_id, title, description, due_date, deadline, status, notes, " +
+                     "grade, max_grade, priority, is_recurring, recurrence_pattern, attachment_path " +
                      "FROM assignments ORDER BY due_date ASC";
         try (Connection conn = dbConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -49,7 +50,13 @@ public class AssignmentRepository {
                         rs.getDate("due_date") != null ? rs.getDate("due_date").toLocalDate() : null,
                         rs.getDate("deadline") != null ? rs.getDate("deadline").toLocalDate() : null,
                         AssignmentStatus.fromString(rs.getString("status")),
-                        rs.getString("notes")
+                        rs.getString("notes"),
+                        rs.getObject("grade") != null ? rs.getDouble("grade") : null,
+                        rs.getObject("max_grade") != null ? rs.getDouble("max_grade") : 100.0,
+                        com.jscheduler.model.AssignmentPriority.fromString(rs.getString("priority")),
+                        rs.getBoolean("is_recurring"),
+                        rs.getString("recurrence_pattern"),
+                        rs.getString("attachment_path")
                 );
                 assignments.add(assignment);
             }
@@ -66,8 +73,9 @@ public class AssignmentRepository {
      * @return true if successful, false otherwise
      */
     public boolean addAssignment(Assignment assignment) {
-        String sql = "INSERT INTO assignments (id, course_id, title, description, due_date, deadline, status, notes) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO assignments (id, course_id, title, description, due_date, deadline, status, notes, " +
+                     "grade, max_grade, priority, is_recurring, recurrence_pattern, attachment_path) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -79,6 +87,17 @@ public class AssignmentRepository {
             pstmt.setDate(6, assignment.getSubmissionDeadline() != null ? Date.valueOf(assignment.getSubmissionDeadline()) : null);
             pstmt.setString(7, assignment.getStatus().getDisplayName());
             pstmt.setString(8, assignment.getNotes());
+
+            if (assignment.getGrade() != null) {
+                pstmt.setDouble(9, assignment.getGrade());
+            } else {
+                pstmt.setNull(9, java.sql.Types.DECIMAL);
+            }
+            pstmt.setDouble(10, assignment.getMaxGrade() != null ? assignment.getMaxGrade() : 100.0);
+            pstmt.setString(11, assignment.getPriority() != null ? assignment.getPriority().getDisplayName() : "Medium");
+            pstmt.setBoolean(12, assignment.isRecurring());
+            pstmt.setString(13, assignment.getRecurrencePattern());
+            pstmt.setString(14, assignment.getAttachmentPath());
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -125,7 +144,9 @@ public class AssignmentRepository {
      */
     public boolean updateAssignment(Assignment assignment) {
         String sql = "UPDATE assignments SET course_id = ?, title = ?, description = ?, " +
-                     "due_date = ?, deadline = ?, status = ?, notes = ? WHERE id = ?";
+                     "due_date = ?, deadline = ?, status = ?, notes = ?, " +
+                     "grade = ?, max_grade = ?, priority = ?, is_recurring = ?, recurrence_pattern = ?, attachment_path = ? " +
+                     "WHERE id = ?";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -136,7 +157,18 @@ public class AssignmentRepository {
             pstmt.setDate(5, assignment.getSubmissionDeadline() != null ? Date.valueOf(assignment.getSubmissionDeadline()) : null);
             pstmt.setString(6, assignment.getStatus().getDisplayName());
             pstmt.setString(7, assignment.getNotes());
-            pstmt.setString(8, assignment.getId());
+
+            if (assignment.getGrade() != null) {
+                pstmt.setDouble(8, assignment.getGrade());
+            } else {
+                pstmt.setNull(8, java.sql.Types.DECIMAL);
+            }
+            pstmt.setDouble(9, assignment.getMaxGrade() != null ? assignment.getMaxGrade() : 100.0);
+            pstmt.setString(10, assignment.getPriority() != null ? assignment.getPriority().getDisplayName() : "Medium");
+            pstmt.setBoolean(11, assignment.isRecurring());
+            pstmt.setString(12, assignment.getRecurrencePattern());
+            pstmt.setString(13, assignment.getAttachmentPath());
+            pstmt.setString(14, assignment.getId());
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {

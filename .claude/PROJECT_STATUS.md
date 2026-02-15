@@ -1,11 +1,11 @@
 # J-Scheduler Project Status
 
-**Last Updated**: 2026-01-30
+**Last Updated**: 2026-02-15
 
 ---
 
 ## Current Version
-- **Version**: 1.0.0
+- **Version**: 1.1.0
 - **Status**: Active Development
 - **Platform**: JavaFX Desktop Application
 - **Java Version**: 17
@@ -16,15 +16,57 @@
 
 ### Core Functionality
 - ✅ Course management (add, edit, delete)
-- ✅ Assignment tracking with status (Not Started, In Progress, Submitted, Graded)
+- ✅ Assignment tracking with status (Not Started, In Progress, Submitted, Late)
 - ✅ Due date and deadline management
 - ✅ Next assignment due indicator
 - ✅ Semester organization
+- ✅ Course filtering (click course to see its assignments)
+- ✅ "All Assignments" button to view all assignments
+
+### NEW FEATURES (v1.1.0)
+
+#### Dashboard with Statistics
+- ✅ Statistics cards showing key metrics
+- ✅ Pie chart for assignment status distribution
+- ✅ Bar chart for pending assignments by course
+- ✅ Bar chart for assignments by priority
+- ✅ Real-time GPA calculation
+- ✅ Average grade display
+
+#### Grade Tracking
+- ✅ Grade field for each assignment (0-100)
+- ✅ Max grade field (default: 100)
+- ✅ Percentage calculation
+- ✅ Average grade across all assignments
+
+#### GPA Calculator
+- ✅ Credit hours per course
+- ✅ Numeric grade per course (0-100)
+- ✅ Letter grade selection (A+ to F)
+- ✅ 4.0 scale GPA calculation
+- ✅ Semester and overall GPA
+
+#### Assignment Priority Levels
+- ✅ Four priority levels: Urgent, High, Medium, Low
+- ✅ Color-coded display
+- ✅ Priority-based filtering
+- ✅ Priority distribution charts
+
+#### Recurring Assignments
+- ✅ Recurring checkbox
+- ✅ Recurrence patterns: Daily, Weekly, Biweekly, Monthly
+- ✅ Pattern tracking
+
+#### File Attachments
+- ✅ File browser for selecting attachments
+- ✅ Full path storage
+- ✅ Clear attachment button
+- ✅ Support for any file type
 
 ### Storage
-- **Current**: JSON file storage (`~/.jscheduler/semester.json`)
-- **Library**: Gson for serialization
-- **Backup**: Automatic backup on corrupted file detection
+- **Current**: MariaDB database
+- **Connection**: JDBC with connection pooling
+- **Backup**: Database-level backup recommended
 
 ### User Interface
 - JavaFX-based desktop application
@@ -50,24 +92,34 @@ j-scheduler-v1/
 │   ├── java/com/jscheduler/
 │   │   ├── App.java                           # Application entry point
 │   │   ├── model/                             # Data models
-│   │   │   ├── Assignment.java
-│   │   │   ├── AssignmentStatus.java
-│   │   │   ├── Course.java
-│   │   │   └── Semester.java
+│   │   │   ├── Assignment.java                # Assignment model with new fields
+│   │   │   ├── AssignmentStatus.java          # Assignment status enum
+│   │   │   ├── AssignmentPriority.java        # NEW: Priority levels
+│   │   │   └── Course.java                    # Course model with GPA fields
+│   │   ├── data/                              # Data access layer
+│   │   │   ├── AssignmentRepository.java      # Assignment CRUD operations
+│   │   │   ├── CourseRepository.java          # Course CRUD operations
+│   │   │   └── DatabaseConnection.java        # Database connection management
 │   │   ├── service/                           # Business logic
-│   │   │   ├── DataService.java              # Main data management (singleton)
-│   │   │   └── JsonPersistenceService.java   # JSON file I/O
+│   │   │   └── GPACalculator.java             # NEW: GPA calculation service
 │   │   └── ui/                                # UI controllers
-│   │       ├── MainController.java
+│   │       ├── MainController.java            # Main window controller
+│   │       ├── DashboardController.java       # NEW: Dashboard controller
 │   │       └── dialog/
-│   │           ├── AssignmentDialogController.java
-│   │           └── CourseDialogController.java
+│   │           ├── AssignmentDialogController.java  # Assignment dialog
+│   │           └── CourseDialogController.java      # Course dialog
 │   └── resources/
+│       ├── database.properties                # Database configuration
 │       └── ui/                                # FXML layouts
-│           ├── AssignmentDialog.fxml
-│           ├── CourseDialog.fxml
-│           └── main.fxml
+│           ├── AssignmentDialog.fxml          # Assignment dialog with new fields
+│           ├── CourseDialog.fxml              # Course dialog with GPA fields
+│           ├── Dashboard.fxml                 # NEW: Dashboard layout
+│           ├── MainView.fxml                  # Main window layout
+│           └── styles.css                     # Application styles
 ├── build.gradle                               # Gradle build configuration
+├── schema.sql                                 # Database schema
+├── migration.sql                              # NEW: Migration script for existing DBs
+├── NEW_FEATURES.md                           # NEW: Feature documentation
 └── .claude/                                   # Project documentation
     ├── PROJECT_STATUS.md                      # This file
     └── MARIADB_MIGRATION_PLAN.md             # Database migration plan
@@ -220,8 +272,22 @@ j-scheduler-v1/
 
 ## Version History
 
+### 1.1.0 (2026-02-15)
+- ✨ NEW: Dashboard with comprehensive statistics and charts
+- ✨ NEW: Grade tracking for assignments (grade/max grade)
+- ✨ NEW: GPA calculator with letter grades and credit hours
+- ✨ NEW: Assignment priority levels (Urgent, High, Medium, Low)
+- ✨ NEW: Recurring assignments with multiple patterns
+- ✨ NEW: File attachments for assignments
+- 🔧 Enhanced UI with color-coded priorities and statuses
+- 🔧 Updated database schema with new fields
+- 📝 Added migration.sql for existing databases
+- 📝 Comprehensive NEW_FEATURES.md documentation
+
 ### 1.0.0 (2026-01-30)
 - Initial release
 - Core course and assignment management
-- JSON-based storage
+- MariaDB database storage
 - JavaFX desktop UI
+- Status tracking (Not Started, In Progress, Submitted, Late)
+- Course filtering and "All Assignments" view

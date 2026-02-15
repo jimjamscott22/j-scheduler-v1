@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.BorderPane?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.jscheduler.ui.DashboardController"
+      spacing="20" styleClass="dashboard">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- Statistics Cards -->
+    <GridPane hgap="15" vgap="15">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="25"/>
+            <ColumnConstraints percentWidth="25"/>
+            <ColumnConstraints percentWidth="25"/>
+            <ColumnConstraints percentWidth="25"/>
+        </columnConstraints>
+
+        <!-- Card 1: Total Courses -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Total Courses" styleClass="stat-label"/>
+            <Label fx:id="totalCoursesLabel" text="0" styleClass="stat-value"/>
+        </VBox>
+
+        <!-- Card 2: Total Assignments -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Total Assignments" styleClass="stat-label"/>
+            <Label fx:id="totalAssignmentsLabel" text="0" styleClass="stat-value"/>
+        </VBox>
+
+        <!-- Card 3: Completed -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="2" GridPane.rowIndex="0">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Completed" styleClass="stat-label"/>
+            <Label fx:id="completedAssignmentsLabel" text="0" styleClass="stat-value-success"/>
+        </VBox>
+
+        <!-- Card 4: Pending -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="3" GridPane.rowIndex="0">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Pending" styleClass="stat-label"/>
+            <Label fx:id="pendingAssignmentsLabel" text="0" styleClass="stat-value-warning"/>
+        </VBox>
+
+        <!-- Card 5: Upcoming This Week -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Due This Week" styleClass="stat-label"/>
+            <Label fx:id="upcomingThisWeekLabel" text="0" styleClass="stat-value-info"/>
+        </VBox>
+
+        <!-- Card 6: Overdue -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Overdue" styleClass="stat-label"/>
+            <Label fx:id="overdueLabel" text="0" styleClass="stat-value-danger"/>
+        </VBox>
+
+        <!-- Card 7: Current GPA -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="2" GridPane.rowIndex="1">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Current GPA" styleClass="stat-label"/>
+            <Label fx:id="currentGPALabel" text="N/A" styleClass="stat-value-primary"/>
+        </VBox>
+
+        <!-- Card 8: Average Grade -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="3" GridPane.rowIndex="1">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Avg. Grade" styleClass="stat-label"/>
+            <Label fx:id="averageGradeLabel" text="N/A" styleClass="stat-value-primary"/>
+        </VBox>
+    </GridPane>
+
+    <!-- Charts Row -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+        <!-- Status Pie Chart -->
+        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Assignment Status Distribution" styleClass="chart-title"/>
+            <PieChart fx:id="statusPieChart" VBox.vgrow="ALWAYS" legendVisible="true"/>
+        </VBox>
+
+        <!-- Course Workload Chart -->
+        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="Pending Assignments by Course" styleClass="chart-title"/>
+            <BarChart fx:id="courseWorkloadChart" VBox.vgrow="ALWAYS" legendVisible="false">
+                <xAxis>
+                    <CategoryAxis side="BOTTOM" label="Course"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis side="LEFT" label="Count"/>
+                </yAxis>
+            </BarChart>
+        </VBox>
+    </HBox>
+
+    <!-- Priority Chart -->
+    <VBox styleClass="chart-card" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets top="15" right="15" bottom="15" left="15"/>
+        </padding>
+        <Label text="Pending Assignments by Priority" styleClass="chart-title"/>
+        <BarChart fx:id="priorityChart" VBox.vgrow="ALWAYS" legendVisible="false">
+            <xAxis>
+                <CategoryAxis side="BOTTOM" label="Priority"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis side="LEFT" label="Count"/>
+            </yAxis>
+        </BarChart>
+    </VBox>
+</VBox>
+

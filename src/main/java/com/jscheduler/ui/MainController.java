@@ -15,6 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -63,6 +64,7 @@ public class MainController {
     private AssignmentRepository assignmentRepository;
     private Assignment currentAssignment;
     private FilteredList<Assignment> filteredAssignments;
+    private Course selectedCourseFilter;
 
     @FXML
     private TextField detailTitleField;
@@ -176,6 +178,12 @@ public class MainController {
         filteredAssignments = new FilteredList<>(assignmentRepository.getAssignments(), assignment -> true);
         assignmentTable.setItems(filteredAssignments);
         assignmentTable.setPlaceholder(new Label("No assignments yet."));
+
+        // Wire up filter controls
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> applyAllFilters());
+        statusFilterCombo.valueProperty().addListener((obs, oldVal, newVal) -> applyAllFilters());
+        fromDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> applyAllFilters());
+        toDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> applyAllFilters());
 
         assignmentTable.getSelectionModel().selectedItemProperty().addListener(
             (obs, oldSelection, newSelection) -> {
@@ -358,7 +366,13 @@ public class MainController {
                 selectedAssignment.setSubmissionDeadline(updatedAssignment.getSubmissionDeadline());
                 selectedAssignment.setStatus(updatedAssignment.getStatus());
                 selectedAssignment.setNotes(updatedAssignment.getNotes());
-                
+                selectedAssignment.setGrade(updatedAssignment.getGrade());
+                selectedAssignment.setMaxGrade(updatedAssignment.getMaxGrade());
+                selectedAssignment.setPriority(updatedAssignment.getPriority());
+                selectedAssignment.setRecurring(updatedAssignment.isRecurring());
+                selectedAssignment.setRecurrencePattern(updatedAssignment.getRecurrencePattern());
+                selectedAssignment.setAttachmentPath(updatedAssignment.getAttachmentPath());
+
                 Course course = findCourseById(selectedAssignment.getCourseId());
                 if (course != null) {
                     selectedAssignment.setCourseName(course.getName());
@@ -511,13 +525,62 @@ public class MainController {
     @FXML
     private void handleShowAllAssignments() {
         courseListView.getSelectionModel().clearSelection();
-        applyCourseFilter(null);
+        selectedCourseFilter = null;
+        applyAllFilters();
     }
 
     private void applyCourseFilter(Course selectedCourse) {
-        String selectedCourseId = selectedCourse != null ? selectedCourse.getId() : null;
-        filteredAssignments.setPredicate(assignment -> selectedCourseId == null
-                || assignment.getCourseId().equals(selectedCourseId));
+        selectedCourseFilter = selectedCourse;
+        applyAllFilters();
+    }
+
+    private void applyAllFilters() {
+        String courseId = selectedCourseFilter != null ? selectedCourseFilter.getId() : null;
+        String searchText = searchField.getText() != null ? searchField.getText().toLowerCase().trim() : "";
+        String statusFilter = statusFilterCombo.getValue();
+        LocalDate fromDate = fromDatePicker.getValue();
+        LocalDate toDate = toDatePicker.getValue();
+
+        filteredAssignments.setPredicate(assignment -> {
+            // Course filter
+            if (courseId != null && !assignment.getCourseId().equals(courseId)) {
+                return false;
+            }
+
+            // Status filter
+            if (statusFilter != null && !"Any".equals(statusFilter)) {
+                AssignmentStatus filterStatus = AssignmentStatus.fromString(statusFilter);
+                if (assignment.getStatus() != filterStatus) {
+                    return false;
+                }
+            }
+
+            // Text search (title, notes, course name)
+            if (!searchText.isEmpty()) {
+                boolean matchesTitle = assignment.getTitle() != null
+                        && assignment.getTitle().toLowerCase().contains(searchText);
+                boolean matchesNotes = assignment.getNotes() != null
+                        && assignment.getNotes().toLowerCase().contains(searchText);
+                boolean matchesCourse = assignment.getCourseName() != null
+                        && assignment.getCourseName().toLowerCase().contains(searchText);
+                if (!matchesTitle && !matchesNotes && !matchesCourse) {
+                    return false;
+                }
+            }
+
+            // Date range filter (on due date)
+            if (fromDate != null && assignment.getDueDate() != null
+                    && assignment.getDueDate().isBefore(fromDate)) {
+                return false;
+            }
+            if (toDate != null && assignment.getDueDate() != null
+                    && assignment.getDueDate().isAfter(toDate)) {
+                return false;
+            }
+
+            return true;
+        });
+
         assignmentTable.getSelectionModel().clearSelection();
         clearDetailPanel();
         updateAssignmentButtons(null);

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.DialogPane?>
@@ -10,6 +12,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 
 <DialogPane fx:id="dialogPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.jscheduler.ui.dialog.AssignmentDialogController"
@@ -43,9 +46,32 @@
             <Label text="Status" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
             <ComboBox fx:id="statusCombo" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-            <Label text="Notes" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <Label text="Priority" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <ComboBox fx:id="priorityCombo" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+            <Label text="Grade" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+            <HBox spacing="8" GridPane.rowIndex="7" GridPane.columnIndex="1">
+                <TextField fx:id="gradeField" promptText="0.0" prefWidth="80"/>
+                <Label text="/"/>
+                <TextField fx:id="maxGradeField" promptText="100.0" prefWidth="80"/>
+            </HBox>
+
+            <Label text="Recurring" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+            <HBox spacing="8" alignment="CENTER_LEFT" GridPane.rowIndex="8" GridPane.columnIndex="1">
+                <CheckBox fx:id="recurringCheckBox"/>
+                <ComboBox fx:id="recurrenceCombo" promptText="Pattern" prefWidth="120" disable="true"/>
+            </HBox>
+
+            <Label text="Attachment" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+            <HBox spacing="8" GridPane.rowIndex="9" GridPane.columnIndex="1">
+                <TextField fx:id="attachmentField" editable="false" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="browseButton" text="Browse..." onAction="#handleBrowse"/>
+                <Button fx:id="clearAttachmentButton" text="Clear" onAction="#handleClearAttachment"/>
+            </HBox>
+
+            <Label text="Notes" GridPane.rowIndex="10" GridPane.columnIndex="0"/>
             <TextArea fx:id="notesArea" prefRowCount="3"
-                      GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                      GridPane.rowIndex="10" GridPane.columnIndex="1"/>
         </GridPane>
     </content>
     <buttonTypes>

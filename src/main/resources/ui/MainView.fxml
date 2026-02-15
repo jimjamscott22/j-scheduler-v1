@@ -45,6 +45,10 @@
     <center>
         <TabPane>
             <tabs>
+                <Tab text="Dashboard" closable="false">
+                    <fx:include source="Dashboard.fxml"/>
+                </Tab>
+
                 <Tab text="Assignments" closable="false">
                     <BorderPane>
                         <center>

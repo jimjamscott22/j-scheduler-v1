@@ -299,3 +299,90 @@
     -fx-font-weight: bold;
     -fx-text-fill: #1e293b;
 }
+
+/* Dashboard styling */
+.dashboard {
+    -fx-background-color: #f4f4f8;
+}
+
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 2);
+    -fx-spacing: 10;
+}
+
+.stat-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: normal;
+}
+
+.stat-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+.stat-value-success {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #10b981;
+}
+
+.stat-value-warning {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f59e0b;
+}
+
+.stat-value-danger {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ef4444;
+}
+
+.stat-value-info {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3b82f6;
+}
+
+.stat-value-primary {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #667eea;
+}
+
+.chart-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 2);
+    -fx-spacing: 10;
+}
+
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+/* Priority styling */
+.priority-urgent {
+    -fx-text-fill: #dc2626;
+    -fx-font-weight: bold;
+}
+
+.priority-high {
+    -fx-text-fill: #f59e0b;
+    -fx-font-weight: bold;
+}
+
+.priority-medium {
+    -fx-text-fill: #3b82f6;
+}
+
+.priority-low {
+    -fx-text-fill: #64748b;
+}
+

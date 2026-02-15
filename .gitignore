@@ -69,9 +69,5 @@ logs/
 temp/
 tmp/
 .gradle/file-system.probe
-previous-compilation-data.bin
-build/tmp/compileJava/previous-compilation-data.bin
-build/tmp/compileJava/previous-compilation-data.bin
-build/tmp/compileJava/previous-compilation-data.bin
-build/tmp/compileJava/previous-compilation-data.bin
 /build
+/build/classes

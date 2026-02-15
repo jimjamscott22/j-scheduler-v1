@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
@@ -34,6 +35,15 @@
 
             <Label text="Semester" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
             <TextField fx:id="semesterField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label text="Credit Hours" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <TextField fx:id="creditHoursField" promptText="3.0" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+            <Label text="Current Grade" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <TextField fx:id="currentGradeField" promptText="0.0-100.0" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+            <Label text="Letter Grade" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <ComboBox fx:id="letterGradeCombo" promptText="Select grade" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
         </GridPane>
     </content>
     <buttonTypes>

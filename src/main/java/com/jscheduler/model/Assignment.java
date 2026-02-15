@@ -1,9 +1,6 @@
 package com.jscheduler.model;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -19,15 +16,33 @@ public class Assignment {
 
     private final StringProperty courseName;
 
+    // New fields for enhanced features
+    private final ObjectProperty<Double> grade;
+    private final ObjectProperty<Double> maxGrade;
+    private final ObjectProperty<AssignmentPriority> priority;
+    private final BooleanProperty isRecurring;
+    private final StringProperty recurrencePattern; // e.g., "WEEKLY", "BIWEEKLY", "MONTHLY"
+    private final StringProperty attachmentPath;
+
     public Assignment(String courseId, String title, String description,
                      LocalDate dueDate, LocalDate submissionDeadline,
                      AssignmentStatus status, String notes) {
-        this(generateId(), courseId, title, description, dueDate, submissionDeadline, status, notes);
+        this(generateId(), courseId, title, description, dueDate, submissionDeadline, status, notes,
+             null, null, AssignmentPriority.MEDIUM, false, null, null);
     }
 
     public Assignment(String id, String courseId, String title, String description,
                      LocalDate dueDate, LocalDate submissionDeadline,
                      AssignmentStatus status, String notes) {
+        this(id, courseId, title, description, dueDate, submissionDeadline, status, notes,
+             null, null, AssignmentPriority.MEDIUM, false, null, null);
+    }
+
+    public Assignment(String id, String courseId, String title, String description,
+                     LocalDate dueDate, LocalDate submissionDeadline,
+                     AssignmentStatus status, String notes,
+                     Double grade, Double maxGrade, AssignmentPriority priority,
+                     boolean isRecurring, String recurrencePattern, String attachmentPath) {
         this.id = new SimpleStringProperty(id);
         this.courseId = new SimpleStringProperty(courseId);
         this.title = new SimpleStringProperty(title);
@@ -37,6 +52,14 @@ public class Assignment {
         this.status = new SimpleObjectProperty<>(status != null ? status : AssignmentStatus.NOT_STARTED);
         this.notes = new SimpleStringProperty(notes);
         this.courseName = new SimpleStringProperty("");
+
+        // Initialize new fields
+        this.grade = new SimpleObjectProperty<>(grade);
+        this.maxGrade = new SimpleObjectProperty<>(maxGrade != null ? maxGrade : 100.0);
+        this.priority = new SimpleObjectProperty<>(priority != null ? priority : AssignmentPriority.MEDIUM);
+        this.isRecurring = new SimpleBooleanProperty(isRecurring);
+        this.recurrencePattern = new SimpleStringProperty(recurrencePattern);
+        this.attachmentPath = new SimpleStringProperty(attachmentPath);
     }
 
     private static String generateId() {
@@ -145,5 +168,81 @@ public class Assignment {
 
     public void setCourseName(String courseName) {
         this.courseName.set(courseName);
+    }
+
+    // Grade tracking
+    public ObjectProperty<Double> gradeProperty() {
+        return grade;
+    }
+
+    public Double getGrade() {
+        return grade.get();
+    }
+
+    public void setGrade(Double grade) {
+        this.grade.set(grade);
+    }
+
+    public ObjectProperty<Double> maxGradeProperty() {
+        return maxGrade;
+    }
+
+    public Double getMaxGrade() {
+        return maxGrade.get();
+    }
+
+    public void setMaxGrade(Double maxGrade) {
+        this.maxGrade.set(maxGrade);
+    }
+
+    // Priority
+    public ObjectProperty<AssignmentPriority> priorityProperty() {
+        return priority;
+    }
+
+    public AssignmentPriority getPriority() {
+        return priority.get();
+    }
+
+    public void setPriority(AssignmentPriority priority) {
+        this.priority.set(priority);
+    }
+
+    // Recurring assignments
+    public BooleanProperty isRecurringProperty() {
+        return isRecurring;
+    }
+
+    public boolean isRecurring() {
+        return isRecurring.get();
+    }
+
+    public void setRecurring(boolean recurring) {
+        this.isRecurring.set(recurring);
+    }
+
+    public StringProperty recurrencePatternProperty() {
+        return recurrencePattern;
+    }
+
+    public String getRecurrencePattern() {
+        return recurrencePattern.get();
+    }
+
+    public void setRecurrencePattern(String pattern) {
+        this.recurrencePattern.set(pattern);
+    }
+
+    // File attachments
+    public StringProperty attachmentPathProperty() {
+        return attachmentPath;
+    }
+
+    public String getAttachmentPath() {
+        return attachmentPath.get();
+    }
+
+    public void setAttachmentPath(String path) {
+        this.attachmentPath.set(path);
     }
 }
