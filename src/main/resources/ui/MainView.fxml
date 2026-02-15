@@ -71,6 +71,8 @@
                                                 </padding>
                                                 <Label text="Assignments" styleClass="section-label"/>
                                                 <Region HBox.hgrow="ALWAYS"/>
+                                                <Button fx:id="showAllAssignmentsButton" text="All Assignments"
+                                                        onAction="#handleShowAllAssignments"/>
                                                 <Button fx:id="editAssignmentButton" text="Edit" onAction="#handleEditAssignment" styleClass="edit-button"/>
                                                 <Button fx:id="deleteAssignmentButton" text="Delete" onAction="#handleDeleteAssignment" styleClass="delete-button"/>
                                             </HBox>

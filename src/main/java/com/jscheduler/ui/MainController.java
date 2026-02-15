@@ -9,6 +9,7 @@ import com.jscheduler.ui.dialog.AssignmentDialogController;
 import com.jscheduler.ui.dialog.CourseDialogController;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
@@ -31,6 +32,8 @@ public class MainController {
     private DatePicker toDatePicker;
     @FXML
     private Button addAssignmentButton;
+    @FXML
+    private Button showAllAssignmentsButton;
 
     @FXML
     private ListView<Course> courseListView;
@@ -59,6 +62,7 @@ public class MainController {
     private CourseRepository courseRepository;
     private AssignmentRepository assignmentRepository;
     private Assignment currentAssignment;
+    private FilteredList<Assignment> filteredAssignments;
 
     @FXML
     private TextField detailTitleField;
@@ -116,6 +120,9 @@ public class MainController {
 
         courseListView.setItems(courseRepository.getCourses());
         courseListView.setPlaceholder(new Label("No courses yet."));
+        courseListView.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> applyCourseFilter(newSelection)
+        );
 
         // Double-click to view/edit course details
         courseListView.setOnMouseClicked(event -> {
@@ -166,7 +173,8 @@ public class MainController {
         });
         notesColumn.setCellValueFactory(cellData -> cellData.getValue().notesProperty());
 
-        assignmentTable.setItems(assignmentRepository.getAssignments());
+        filteredAssignments = new FilteredList<>(assignmentRepository.getAssignments(), assignment -> true);
+        assignmentTable.setItems(filteredAssignments);
         assignmentTable.setPlaceholder(new Label("No assignments yet."));
 
         assignmentTable.getSelectionModel().selectedItemProperty().addListener(
@@ -498,5 +506,20 @@ public class MainController {
         detailSaveButton.setDisable(true);
         detailRevertButton.setDisable(true);
         if (detailDeleteButton != null) detailDeleteButton.setDisable(true);
+    }
+
+    @FXML
+    private void handleShowAllAssignments() {
+        courseListView.getSelectionModel().clearSelection();
+        applyCourseFilter(null);
+    }
+
+    private void applyCourseFilter(Course selectedCourse) {
+        String selectedCourseId = selectedCourse != null ? selectedCourse.getId() : null;
+        filteredAssignments.setPredicate(assignment -> selectedCourseId == null
+                || assignment.getCourseId().equals(selectedCourseId));
+        assignmentTable.getSelectionModel().clearSelection();
+        clearDetailPanel();
+        updateAssignmentButtons(null);
     }
 }
