@@ -386,3 +386,113 @@
     -fx-text-fill: #64748b;
 }
 
+/* Calendar View Styling */
+.calendar-view {
+    -fx-background-color: #f4f4f8;
+}
+
+.calendar-header {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 0 0 1 0;
+}
+
+.calendar-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+.calendar-nav-button {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-padding: 8 16;
+}
+
+.calendar-nav-button:hover {
+    -fx-background-color: #5568d3;
+}
+
+.calendar-nav-button:pressed {
+    -fx-background-color: #4a5bbd;
+}
+
+.calendar-grid {
+    -fx-background-color: #f4f4f8;
+}
+
+.calendar-day-header {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 8;
+}
+
+.calendar-cell {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-padding: 8;
+    -fx-alignment: TOP_LEFT;
+}
+
+.calendar-cell-empty {
+    -fx-background-color: #f8fafc;
+}
+
+.calendar-cell-today {
+    -fx-background-color: #fef3c7;
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 2;
+}
+
+.calendar-cell-has-assignments {
+    -fx-background-color: #eff6ff;
+}
+
+.calendar-day-number {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+.calendar-assignment {
+    -fx-font-size: 11px;
+    -fx-padding: 3 5;
+    -fx-background-radius: 3;
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1e40af;
+    -fx-max-width: Infinity;
+    -fx-wrap-text: false;
+    -fx-text-overrun: ELLIPSIS;
+}
+
+.calendar-assignment.status-not-started {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #64748b;
+}
+
+.calendar-assignment.status-in-progress {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1e40af;
+}
+
+.calendar-assignment.status-submitted {
+    -fx-background-color: #d1fae5;
+    -fx-text-fill: #065f46;
+}
+
+.calendar-assignment.status-late {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #991b1b;
+}
+
+.calendar-more-label {
+    -fx-font-size: 10px;
+    -fx-font-style: italic;
+    -fx-text-fill: #64748b;
+}
+

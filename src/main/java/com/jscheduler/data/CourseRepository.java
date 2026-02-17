@@ -14,6 +14,7 @@ public class CourseRepository {
     private CourseRepository() {
         courses = FXCollections.observableArrayList();
         dbConnection = DatabaseConnection.getInstance();
+        ensureCourseSchema();
         loadCoursesFromDatabase();
     }
 
@@ -56,6 +57,49 @@ public class CourseRepository {
         } catch (SQLException e) {
             System.err.println("Error loading courses from database: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Ensure required columns exist for courses table.
+     */
+    private void ensureCourseSchema() {
+        String checkSql = "SELECT 1 FROM information_schema.columns " +
+                          "WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?";
+        String addCreditHours = "ALTER TABLE courses ADD COLUMN credit_hours DECIMAL(3,1) DEFAULT 3.0";
+        String addCurrentGrade = "ALTER TABLE courses ADD COLUMN current_grade DECIMAL(5,2)";
+        String addLetterGrade = "ALTER TABLE courses ADD COLUMN letter_grade VARCHAR(3)";
+
+        try (Connection conn = dbConnection.getConnection()) {
+            if (!columnExists(conn, checkSql, "courses", "credit_hours")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addCreditHours);
+                }
+            }
+            if (!columnExists(conn, checkSql, "courses", "current_grade")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addCurrentGrade);
+                }
+            }
+            if (!columnExists(conn, checkSql, "courses", "letter_grade")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addLetterGrade);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error ensuring courses schema: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private boolean columnExists(Connection conn, String checkSql, String tableName, String columnName)
+            throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(checkSql)) {
+            pstmt.setString(1, tableName);
+            pstmt.setString(2, columnName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
         }
     }
 

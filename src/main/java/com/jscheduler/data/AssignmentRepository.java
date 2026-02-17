@@ -15,6 +15,7 @@ public class AssignmentRepository {
     private AssignmentRepository() {
         assignments = FXCollections.observableArrayList();
         dbConnection = DatabaseConnection.getInstance();
+        ensureAssignmentSchema();
         loadAssignmentsFromDatabase();
     }
 
@@ -27,6 +28,87 @@ public class AssignmentRepository {
 
     public ObservableList<Assignment> getAssignments() {
         return assignments;
+    }
+
+    /**
+     * Ensure required columns and indexes exist for assignments table.
+     */
+    private void ensureAssignmentSchema() {
+        String checkColumnSql = "SELECT 1 FROM information_schema.columns " +
+                                "WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?";
+        String checkIndexSql = "SELECT 1 FROM information_schema.statistics " +
+                               "WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?";
+
+        String addGrade = "ALTER TABLE assignments ADD COLUMN grade DECIMAL(5,2)";
+        String addMaxGrade = "ALTER TABLE assignments ADD COLUMN max_grade DECIMAL(5,2) DEFAULT 100.0";
+        String addPriority = "ALTER TABLE assignments ADD COLUMN priority VARCHAR(20) DEFAULT 'Medium'";
+        String addRecurring = "ALTER TABLE assignments ADD COLUMN is_recurring BOOLEAN DEFAULT FALSE";
+        String addRecurrence = "ALTER TABLE assignments ADD COLUMN recurrence_pattern VARCHAR(50)";
+        String addAttachment = "ALTER TABLE assignments ADD COLUMN attachment_path VARCHAR(500)";
+        String addPriorityIndex = "ALTER TABLE assignments ADD INDEX idx_priority (priority)";
+
+        try (Connection conn = dbConnection.getConnection()) {
+            if (!columnExists(conn, checkColumnSql, "assignments", "grade")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addGrade);
+                }
+            }
+            if (!columnExists(conn, checkColumnSql, "assignments", "max_grade")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addMaxGrade);
+                }
+            }
+            if (!columnExists(conn, checkColumnSql, "assignments", "priority")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addPriority);
+                }
+            }
+            if (!columnExists(conn, checkColumnSql, "assignments", "is_recurring")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addRecurring);
+                }
+            }
+            if (!columnExists(conn, checkColumnSql, "assignments", "recurrence_pattern")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addRecurrence);
+                }
+            }
+            if (!columnExists(conn, checkColumnSql, "assignments", "attachment_path")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addAttachment);
+                }
+            }
+            if (!indexExists(conn, checkIndexSql, "assignments", "idx_priority")) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.executeUpdate(addPriorityIndex);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error ensuring assignments schema: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private boolean columnExists(Connection conn, String checkSql, String tableName, String columnName)
+            throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(checkSql)) {
+            pstmt.setString(1, tableName);
+            pstmt.setString(2, columnName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    private boolean indexExists(Connection conn, String checkSql, String tableName, String indexName)
+            throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(checkSql)) {
+            pstmt.setString(1, tableName);
+            pstmt.setString(2, indexName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 
     /**

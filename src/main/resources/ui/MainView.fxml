@@ -146,9 +146,7 @@
                 </Tab>
 
                 <Tab text="Calendar" closable="false">
-                    <StackPane>
-                        <Label text="Calendar view coming soon."/>
-                    </StackPane>
+                    <fx:include source="CalendarView.fxml"/>
                 </Tab>
             </tabs>
         </TabPane>
