@@ -171,8 +171,8 @@ public class CalendarController {
                         assignment.getTitle(),
                         assignment.getCourseName(),
                         assignment.getStatus() != null ? assignment.getStatus().getDisplayName() : "Not Started",
-                        assignment.getSubmissionDeadline() != null ? 
-                            "\nDeadline: " + assignment.getSubmissionDeadline().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")) : ""
+                        assignment.getSubmissionDeadline() != null ?
+                            "\nDeadline: " + assignment.getSubmissionDeadline().format(DateTimeFormatter.ofPattern("HH:mm")) : ""
                     );
                     
                     Tooltip tooltip = new Tooltip(tooltipText);

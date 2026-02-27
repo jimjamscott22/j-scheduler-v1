@@ -10,6 +10,9 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,7 @@ public class AssignmentDialogController {
     @FXML
     private DatePicker dueDatePicker;
     @FXML
-    private DatePicker deadlineDatePicker;
+    private TextField deadlineTimeField;
     @FXML
     private ComboBox<String> statusCombo;
     @FXML
@@ -129,7 +132,10 @@ public class AssignmentDialogController {
             titleField.setText(assignment.getTitle());
             descriptionArea.setText(assignment.getDescription());
             dueDatePicker.setValue(assignment.getDueDate());
-            deadlineDatePicker.setValue(assignment.getSubmissionDeadline());
+            if (assignment.getSubmissionDeadline() != null) {
+                deadlineTimeField.setText(assignment.getSubmissionDeadline()
+                        .format(DateTimeFormatter.ofPattern("HH:mm")));
+            }
             notesArea.setText(assignment.getNotes());
 
             if (assignment.getStatus() != null) {
@@ -176,6 +182,16 @@ public class AssignmentDialogController {
             AssignmentStatus status = AssignmentStatus.fromString(statusCombo.getValue());
             AssignmentPriority priority = AssignmentPriority.fromString(priorityCombo.getValue());
 
+            LocalTime deadlineTime = null;
+            String deadlineText = deadlineTimeField.getText();
+            if (deadlineText != null && !deadlineText.trim().isEmpty()) {
+                try {
+                    deadlineTime = LocalTime.parse(deadlineText.trim(), DateTimeFormatter.ofPattern("HH:mm"));
+                } catch (DateTimeParseException e) {
+                    // Invalid time — leave as null
+                }
+            }
+
             Double grade = null;
             if (gradeField.getText() != null && !gradeField.getText().trim().isEmpty()) {
                 try {
@@ -207,7 +223,7 @@ public class AssignmentDialogController {
                     title,
                     description,
                     dueDatePicker.getValue(),
-                    deadlineDatePicker.getValue(),
+                    deadlineTime,
                     status,
                     notes,
                     grade,
@@ -223,7 +239,7 @@ public class AssignmentDialogController {
                     title,
                     description,
                     dueDatePicker.getValue(),
-                    deadlineDatePicker.getValue(),
+                    deadlineTime,
                     status,
                     notes
                 );

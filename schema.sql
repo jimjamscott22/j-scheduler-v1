@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS assignments (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     due_date DATE NOT NULL,
-    deadline DATE,
+    deadline TIME,
     status VARCHAR(50) NOT NULL DEFAULT 'Not Started',
     notes TEXT,
     grade DECIMAL(5,2),

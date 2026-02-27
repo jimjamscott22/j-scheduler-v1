@@ -16,7 +16,9 @@ import javafx.scene.control.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 public class MainController {
@@ -71,7 +73,7 @@ public class MainController {
     @FXML
     private DatePicker detailDueDatePicker;
     @FXML
-    private DatePicker detailDeadlineDatePicker;
+    private TextField detailDeadlineTimeField;
     @FXML
     private ComboBox<String> detailStatusComboBox;
     @FXML
@@ -143,8 +145,8 @@ public class MainController {
             return date != null ? date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")) : "";
         }, cellData.getValue().dueDateProperty()));
         deadlineColumn.setCellValueFactory(cellData -> Bindings.createStringBinding(() -> {
-            var date = cellData.getValue().getSubmissionDeadline();
-            return date != null ? date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")) : "";
+            var time = cellData.getValue().getSubmissionDeadline();
+            return time != null ? time.format(DateTimeFormatter.ofPattern("HH:mm")) : "";
         }, cellData.getValue().submissionDeadlineProperty()));
         statusColumn.setCellValueFactory(cellData -> Bindings.createStringBinding(() -> {
             var status = cellData.getValue().getStatus();
@@ -472,7 +474,18 @@ public class MainController {
 
         currentAssignment.setTitle(detailTitleField.getText());
         currentAssignment.setDueDate(detailDueDatePicker.getValue());
-        currentAssignment.setSubmissionDeadline(detailDeadlineDatePicker.getValue());
+
+        LocalTime deadlineTime = null;
+        String deadlineText = detailDeadlineTimeField.getText();
+        if (deadlineText != null && !deadlineText.trim().isEmpty()) {
+            try {
+                deadlineTime = LocalTime.parse(deadlineText.trim(), DateTimeFormatter.ofPattern("HH:mm"));
+            } catch (DateTimeParseException e) {
+                // Invalid time — leave as null
+            }
+        }
+        currentAssignment.setSubmissionDeadline(deadlineTime);
+
         currentAssignment.setStatus(com.jscheduler.model.AssignmentStatus.fromString(detailStatusComboBox.getValue()));
         currentAssignment.setNotes(detailNotesArea.getText());
 
@@ -500,7 +513,8 @@ public class MainController {
         currentAssignment = assignment;
         detailTitleField.setText(assignment.getTitle());
         detailDueDatePicker.setValue(assignment.getDueDate());
-        detailDeadlineDatePicker.setValue(assignment.getSubmissionDeadline());
+        detailDeadlineTimeField.setText(assignment.getSubmissionDeadline() != null
+                ? assignment.getSubmissionDeadline().format(DateTimeFormatter.ofPattern("HH:mm")) : "");
         detailStatusComboBox.setValue(assignment.getStatus() != null ? assignment.getStatus().getDisplayName() : "Not Started");
         detailNotesArea.setText(assignment.getNotes());
 
@@ -513,7 +527,7 @@ public class MainController {
         currentAssignment = null;
         detailTitleField.clear();
         detailDueDatePicker.setValue(null);
-        detailDeadlineDatePicker.setValue(null);
+        detailDeadlineTimeField.clear();
         detailStatusComboBox.getSelectionModel().selectFirst();
         detailNotesArea.clear();
 

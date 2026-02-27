@@ -113,7 +113,7 @@
                                                         <DatePicker fx:id="detailDueDatePicker" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
 
                                                         <Label text="Deadline" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                                                        <DatePicker fx:id="detailDeadlineDatePicker" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                                        <TextField fx:id="detailDeadlineTimeField" promptText="HH:mm" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                                                         <Label text="Status" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
                                                         <ComboBox fx:id="detailStatusComboBox" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
 

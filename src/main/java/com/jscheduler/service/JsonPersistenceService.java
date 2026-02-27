@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class JsonPersistenceService {
 
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
                 .setPrettyPrinting()
                 .create();
     }
@@ -89,7 +91,7 @@ public class JsonPersistenceService {
         String title;
         String description;
         LocalDate dueDate;
-        LocalDate submissionDeadline;
+        LocalTime submissionDeadline;
         String status;
         String notes;
     }
@@ -170,6 +172,18 @@ public class JsonPersistenceService {
         @Override
         public LocalDate deserialize(JsonElement json, Type type, JsonDeserializationContext context) {
             return json != null && !json.isJsonNull() ? LocalDate.parse(json.getAsString()) : null;
+        }
+    }
+
+    private static class LocalTimeAdapter implements JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
+        @Override
+        public JsonElement serialize(LocalTime time, Type type, JsonSerializationContext context) {
+            return time != null ? new JsonPrimitive(time.toString()) : null;
+        }
+
+        @Override
+        public LocalTime deserialize(JsonElement json, Type type, JsonDeserializationContext context) {
+            return json != null && !json.isJsonNull() ? LocalTime.parse(json.getAsString()) : null;
         }
     }
 }

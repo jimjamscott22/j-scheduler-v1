@@ -41,7 +41,8 @@
             <DatePicker fx:id="dueDatePicker" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
             <Label text="Deadline" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-            <DatePicker fx:id="deadlineDatePicker" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+            <TextField fx:id="deadlineTimeField" promptText="HH:mm (e.g. 23:59)"
+                       GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
             <Label text="Status" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
             <ComboBox fx:id="statusCombo" GridPane.rowIndex="5" GridPane.columnIndex="1"/>

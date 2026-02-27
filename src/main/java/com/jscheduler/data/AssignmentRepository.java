@@ -46,6 +46,7 @@ public class AssignmentRepository {
         String addRecurrence = "ALTER TABLE assignments ADD COLUMN recurrence_pattern VARCHAR(50)";
         String addAttachment = "ALTER TABLE assignments ADD COLUMN attachment_path VARCHAR(500)";
         String addPriorityIndex = "ALTER TABLE assignments ADD INDEX idx_priority (priority)";
+        String migrateDeadlineToTime = "ALTER TABLE assignments MODIFY COLUMN deadline TIME";
 
         try (Connection conn = dbConnection.getConnection()) {
             if (!columnExists(conn, checkColumnSql, "assignments", "grade")) {
@@ -81,6 +82,17 @@ public class AssignmentRepository {
             if (!indexExists(conn, checkIndexSql, "assignments", "idx_priority")) {
                 try (Statement stmt = conn.createStatement()) {
                     stmt.executeUpdate(addPriorityIndex);
+                }
+            }
+            // Migrate deadline column from DATE to TIME if it's still DATE type
+            String checkDeadlineTypeSql = "SELECT data_type FROM information_schema.columns " +
+                    "WHERE table_schema = DATABASE() AND table_name = 'assignments' AND column_name = 'deadline'";
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(checkDeadlineTypeSql)) {
+                if (rs.next() && "date".equalsIgnoreCase(rs.getString("data_type"))) {
+                    try (Statement alterStmt = conn.createStatement()) {
+                        alterStmt.executeUpdate(migrateDeadlineToTime);
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -130,7 +142,7 @@ public class AssignmentRepository {
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getDate("due_date") != null ? rs.getDate("due_date").toLocalDate() : null,
-                        rs.getDate("deadline") != null ? rs.getDate("deadline").toLocalDate() : null,
+                        rs.getTime("deadline") != null ? rs.getTime("deadline").toLocalTime() : null,
                         AssignmentStatus.fromString(rs.getString("status")),
                         rs.getString("notes"),
                         rs.getObject("grade") != null ? rs.getDouble("grade") : null,
@@ -166,7 +178,7 @@ public class AssignmentRepository {
             pstmt.setString(3, assignment.getTitle());
             pstmt.setString(4, assignment.getDescription());
             pstmt.setDate(5, assignment.getDueDate() != null ? Date.valueOf(assignment.getDueDate()) : null);
-            pstmt.setDate(6, assignment.getSubmissionDeadline() != null ? Date.valueOf(assignment.getSubmissionDeadline()) : null);
+            pstmt.setTime(6, assignment.getSubmissionDeadline() != null ? Time.valueOf(assignment.getSubmissionDeadline()) : null);
             pstmt.setString(7, assignment.getStatus().getDisplayName());
             pstmt.setString(8, assignment.getNotes());
 
@@ -236,7 +248,7 @@ public class AssignmentRepository {
             pstmt.setString(2, assignment.getTitle());
             pstmt.setString(3, assignment.getDescription());
             pstmt.setDate(4, assignment.getDueDate() != null ? Date.valueOf(assignment.getDueDate()) : null);
-            pstmt.setDate(5, assignment.getSubmissionDeadline() != null ? Date.valueOf(assignment.getSubmissionDeadline()) : null);
+            pstmt.setTime(5, assignment.getSubmissionDeadline() != null ? Time.valueOf(assignment.getSubmissionDeadline()) : null);
             pstmt.setString(6, assignment.getStatus().getDisplayName());
             pstmt.setString(7, assignment.getNotes());
 

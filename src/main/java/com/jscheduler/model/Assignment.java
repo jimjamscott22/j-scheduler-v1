@@ -2,6 +2,7 @@ package com.jscheduler.model;
 
 import javafx.beans.property.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 public class Assignment {
@@ -10,7 +11,7 @@ public class Assignment {
     private final StringProperty title;
     private final StringProperty description;
     private final ObjectProperty<LocalDate> dueDate;
-    private final ObjectProperty<LocalDate> submissionDeadline;
+    private final ObjectProperty<LocalTime> submissionDeadline;
     private final ObjectProperty<AssignmentStatus> status;
     private final StringProperty notes;
 
@@ -25,21 +26,21 @@ public class Assignment {
     private final StringProperty attachmentPath;
 
     public Assignment(String courseId, String title, String description,
-                     LocalDate dueDate, LocalDate submissionDeadline,
+                     LocalDate dueDate, LocalTime submissionDeadline,
                      AssignmentStatus status, String notes) {
         this(generateId(), courseId, title, description, dueDate, submissionDeadline, status, notes,
              null, null, AssignmentPriority.MEDIUM, false, null, null);
     }
 
     public Assignment(String id, String courseId, String title, String description,
-                     LocalDate dueDate, LocalDate submissionDeadline,
+                     LocalDate dueDate, LocalTime submissionDeadline,
                      AssignmentStatus status, String notes) {
         this(id, courseId, title, description, dueDate, submissionDeadline, status, notes,
              null, null, AssignmentPriority.MEDIUM, false, null, null);
     }
 
     public Assignment(String id, String courseId, String title, String description,
-                     LocalDate dueDate, LocalDate submissionDeadline,
+                     LocalDate dueDate, LocalTime submissionDeadline,
                      AssignmentStatus status, String notes,
                      Double grade, Double maxGrade, AssignmentPriority priority,
                      boolean isRecurring, String recurrencePattern, String attachmentPath) {
@@ -122,15 +123,15 @@ public class Assignment {
         this.dueDate.set(dueDate);
     }
 
-    public ObjectProperty<LocalDate> submissionDeadlineProperty() {
+    public ObjectProperty<LocalTime> submissionDeadlineProperty() {
         return submissionDeadline;
     }
 
-    public LocalDate getSubmissionDeadline() {
+    public LocalTime getSubmissionDeadline() {
         return submissionDeadline.get();
     }
 
-    public void setSubmissionDeadline(LocalDate submissionDeadline) {
+    public void setSubmissionDeadline(LocalTime submissionDeadline) {
         this.submissionDeadline.set(submissionDeadline);
     }
 
